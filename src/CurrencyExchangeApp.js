@@ -94,7 +94,8 @@ const CurrencyExchangeApp = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div>
+      <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>MYR Exchange Rate</h1>
       
       {latestRate && (
@@ -170,6 +171,7 @@ const CurrencyExchangeApp = () => {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 };
