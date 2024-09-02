@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
   const [timeFrame, setTimeFrame] = useState('day');
-  const [processedData, setProcessedData] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
@@ -18,7 +22,7 @@ const CurrencyExchangeApp = () => {
           rate: parseFloat(item.exchange_rate)
         })).sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp descending
         setData(formattedData);
-        setLatestRate(formattedData.at(-1)); // Set the latest rate
+        setLatestRate(formattedData[0]); // Set the latest rate
       });
   }, []);
 
@@ -28,7 +32,7 @@ const CurrencyExchangeApp = () => {
       data.forEach(item => {
         const date = new Date(item.timestamp);
         let key;
-        switch(timeFrame) {
+        switch (timeFrame) {
           case 'hour':
             key = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).getTime();
             break;
@@ -55,7 +59,8 @@ const CurrencyExchangeApp = () => {
         rate: item.rate
       }));
 
-      setProcessedData(processed.reverse()); // Reverse to show newest data first
+      setChartData(processed); // Keep the chart data in ascending order
+      setTableData([...processed].reverse()); // Reverse the data for the table
     };
 
     processData();
@@ -63,13 +68,13 @@ const CurrencyExchangeApp = () => {
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
-    switch(timeFrame) {
+    switch (timeFrame) {
       case 'hour':
-        return date.toLocaleString(undefined, { 
-          year: 'numeric', 
-          month: '2-digit', 
-          day: '2-digit', 
-          hour: '2-digit', 
+        return date.toLocaleString(undefined, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
           minute: '2-digit'
         });
       case 'day':
@@ -98,8 +103,8 @@ const CurrencyExchangeApp = () => {
   // Pagination calculations
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = processedData.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(processedData.length / recordsPerPage);
+  const currentRecords = tableData.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(tableData.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -109,12 +114,12 @@ const CurrencyExchangeApp = () => {
     <div>
       <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>MYR Exchange Rate</h1>
-      
+
         {latestRate && (
-          <div style={{ 
-            backgroundColor: '#f0f0f0', 
-            padding: '20px', 
-            borderRadius: '8px', 
+          <div style={{
+            backgroundColor: '#f0f0f0',
+            padding: '20px',
+            borderRadius: '8px',
             marginBottom: '20px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
@@ -127,7 +132,7 @@ const CurrencyExchangeApp = () => {
             </p>
           </div>
         )}
-      
+
         <div style={{ marginBottom: '20px' }}>
           <label htmlFor="timeframe-select" style={{ marginRight: '10px' }}>Select Time Frame:</label>
           <select
@@ -142,15 +147,17 @@ const CurrencyExchangeApp = () => {
             <option value="year">Yearly</option>
           </select>
         </div>
-
+        <Container>
+        <Row>
+        <Col xs={12} md={6} lg={6}>
         <div style={{ marginBottom: '40px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Exchange Rate Chart</h2>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={processedData}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
-                tick={{ fontSize: 12 }} 
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 12 }}
                 interval="preserveStartEnd"
                 angle={-45}
                 textAnchor="end"
@@ -163,7 +170,8 @@ const CurrencyExchangeApp = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-
+        </Col>
+        <Col xs={12} md={6} lg={6}>
         <div>
           <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Historical Data Table</h2>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -182,7 +190,7 @@ const CurrencyExchangeApp = () => {
               ))}
             </tbody>
           </table>
-          
+
           {/* Pagination controls */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             {Array.from({ length: totalPages }, (_, index) => (
@@ -203,7 +211,12 @@ const CurrencyExchangeApp = () => {
               </button>
             ))}
           </div>
+          
+      
         </div>
+        </Col>
+      </Row>
+      </Container>
       </div>
     </div>
   );
