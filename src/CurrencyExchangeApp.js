@@ -22,7 +22,7 @@ const CurrencyExchangeApp = () => {
           rate: parseFloat(item.exchange_rate)
         })).sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp descending
         setData(formattedData);
-        setLatestRate(formattedData[0]); // Set the latest rate
+        setLatestRate(formattedData.at(-1)); // Set the latest rate
       });
   }, []);
 
