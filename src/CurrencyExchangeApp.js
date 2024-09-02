@@ -55,6 +55,7 @@ const getYAxisDomain = (data) => {
   ];
 };
 
+
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
   const [timeFrame, setTimeFrame] = useState("hour");
@@ -64,6 +65,26 @@ const CurrencyExchangeApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 6; // Set to 8 records per page
   const yAxisDomain = getYAxisDomain(chartData);
+  const [sgdValue, setSgdValue] = useState("");
+  const [myrValue, setMyrValue] = useState("");
+
+  // State variables for SGD to MYR conversion
+  const [sgdAmount, setSgdAmount] = useState("");
+  const [selectedPlatformSgd, setSelectedPlatformSgd] = useState("CIMB");
+  const [sgdToMyrResult, setSgdToMyrResult] = useState(null);
+
+  // State variables for MYR to SGD conversion
+  const [myrAmount, setMyrAmount] = useState("");
+  const [selectedPlatformMyr, setSelectedPlatformMyr] = useState("CIMB");
+  const [myrToSgdResult, setMyrToSgdResult] = useState(null);
+
+  useEffect(() => {
+    const reloadInterval = setTimeout(() => {
+      window.location.reload();
+    }, 60000); // 60000 milliseconds = 1 minute
+    console.log("Reloaded");
+    return () => clearTimeout(reloadInterval); // Cleanup on unmount
+  }, []);
 
   useEffect(() => {
     fetch(
@@ -81,7 +102,7 @@ const CurrencyExchangeApp = () => {
 
         setData(formattedData.reverse());
         console.log(formattedData);
-        // Determine the latest rates for CIMB and WISE
+        // Determine the latest rates for CIMB, WISE, and PANDAREMIT
         const latestCIMB = formattedData
           .filter((item) => item.platform === "CIMB")
           .at(-1);
@@ -202,13 +223,6 @@ const CurrencyExchangeApp = () => {
     return null;
   };
 
-  // const exportToExcel = () => {
-  //   const worksheet = XLSX.utils.json_to_sheet(tableData);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Exchange Rates");
-  //   XLSX.writeFile(workbook, "exchange_rates.xlsx");
-  // };
-
   // Pagination calculations
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
@@ -219,128 +233,161 @@ const CurrencyExchangeApp = () => {
     setCurrentPage(pageNumber);
   };
 
+  // Handler for SGD to MYR conversion
+  const handleSgdToMyr = (e) => {
+    e.preventDefault();
+    if (!sgdAmount || isNaN(sgdAmount)) {
+      alert("Please enter a valid SGD amount.");
+      return;
+    }
+    const selectedRate = latestRate[selectedPlatformSgd]?.rate;
+    if (!selectedRate) {
+      alert("Selected platform rate is unavailable.");
+      return;
+    }
+    const result = parseFloat(sgdAmount) * selectedRate;
+    setSgdToMyrResult(result.toFixed(4));
+  };
+
+  // Handler for MYR to SGD conversion
+  const handleMyrToSgd = (e) => {
+    e.preventDefault();
+    if (!myrAmount || isNaN(myrAmount)) {
+      alert("Please enter a valid MYR amount.");
+      return;
+    }
+    const selectedRate = latestRate[selectedPlatformMyr]?.rate;
+    if (!selectedRate) {
+      alert("Selected platform rate is unavailable.");
+      return;
+    }
+    const result = parseFloat(myrAmount) / selectedRate;
+    setMyrToSgdResult(result.toFixed(4));
+  };
+
+  const handleSgdChange = (e) => {
+    const value = e.target.value;
+    setSgdValue(value);
+
+    if (latestRate?.CIMB && value) {
+      setMyrValue((value * latestRate.CIMB.rate).toFixed(4));
+    } else {
+      setMyrValue("");
+    }
+  };
+
+  const handleMyrChange = (e) => {
+    const value = e.target.value;
+    setMyrValue(value);
+
+    if (latestRate?.CIMB && value) {
+      setSgdValue((value / latestRate.CIMB.rate).toFixed(4));
+    } else {
+      setSgdValue("");
+    }
+  };
   return (
     <div>
       <div style={{ padding: "20px" }}>
-        <div>
-          {/* <h1
-            style={{
-              fontSize: "24px",
-              fontWeight: "bold",
-              marginBottom: "20px",
-            }}
-          >
-            SGD - MYR Exchange Rate
-          </h1> */}
-
-          <Container>
-            <Row style={{ marginBottom: "10px" }}>
-              {latestRate?.CIMB && (
-                <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
-                  {/* <div
-                    style={{
-                      backgroundColor: "#EECAD5",
-                      padding: "20px",
-                      borderRadius: "8px",
-                      marginBottom: "20px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <h2 style={{ fontSize: "18px", marginBottom: "10px" }}>
-                      CIMB
-                    </h2>
-                    <p
-                      style={{
-                        fontSize: "24px",
-                        fontWeight: "bold",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
-                    </p>
-                  </div> */}
-                  <Card style={{ width: "100%" }}>
-                    <Card.Body>
-                      <Card.Title>
-                      1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR</Card.Title>
-                      <Card.Subtitle className="mb-2 text-muted">CIMB
-                      </Card.Subtitle>
-                      {/* <Card.Text>
-                        Some quick example text to build on the card title and
-                        make up the bulk of the card's content.
-                      </Card.Text>
-                      <Card.Link href="#">Card Link</Card.Link>
-                      <Card.Link href="#">Another Link</Card.Link> */}
-                    </Card.Body>
-                  </Card>
-                </Col>
-              )}
-              {latestRate?.WISE && (
-                <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }} >
-                  <Card style={{ width: "100%" }}>
-                    <Card.Body>
-                      <Card.Title>
-                      1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR</Card.Title>
-                      <Card.Subtitle className="mb-2 text-muted">
-                        WISE
-                      </Card.Subtitle>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              )}
-              {latestRate?.PANDAREMIT && (
-                <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }} >
-                  <Card style={{ width: "100%"}}>
-                    <Card.Body>
-                      <Card.Title>
-                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR</Card.Title>
-                      <Card.Subtitle className="mb-2 text-muted">PANDAREMIT
-                      </Card.Subtitle>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              )}
-            </Row>
-            {/* <Row>
-            <p style={{ fontSize: "14px", color: "#666", textAlign: 'center' }}>
-                      Last updated:{" "}
-                      {new Date(latestRate.timestamp).toLocaleString()}
-                    </p>
-            </Row> */}
-            <Row>{latestRate?.CIMB.timestamp && (
-                <div>
-                  <p
-                    style={{
-                      fontSize: "14px",
-                      color: "#666",
-                      textAlign: "center",
-                    }}
-                  >
-                    Last updated:{" "}
-                    {new Date(latestRate.CIMB.timestamp).toLocaleString()}
-                  </p>
-                </div>
-              )}</Row>
-          </Container>
-        </div>
-
+      <Container style={{ marginTop: "20px", marginBottom: "20px" }}>
+          
+        </Container>
         <Container>
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h3">Details</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              {/* <div class="btn-group mr-2">
-              <Button
-                class="btn btn-sm btn-outline-secondary"
-                style={{ marginRight: 10 }}
-                onClick={exportToExcel}
-                variant="secondary"
-              >
-                Export
-              </Button>
-            </div> */}
-              <div class="btn-group mr-1">
+          {/* Latest Rates Cards */}
+          <Row style={{ marginBottom: "10px" }}>
+            {latestRate?.CIMB && (
+              <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
+                <Card style={{ width: "100%" }}>
+                  <Card.Body>
+                    <Card.Title>
+                      1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
+                    </Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      CIMB
+                    </Card.Subtitle>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
+            {latestRate?.WISE && (
+              <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
+                <Card style={{ width: "100%" }}>
+                  <Card.Body>
+                    <Card.Title>
+                      1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
+                    </Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      WISE
+                    </Card.Subtitle>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
+            {/* {latestRate?.PANDAREMIT && (
+              <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
+                <Card style={{ width: "100%" }}>
+                  <Card.Body>
+                    <Card.Title>
+                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR
+                    </Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      PANDAREMIT
+                    </Card.Subtitle>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )} */}
+            <Col xs={6} md={6} lg={2} style={{ marginTop: "5px"}}>
+              <Form.Group controlId="sgdInput">
+                <Form.Label>SGD</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={sgdValue}
+                  onChange={handleSgdChange}
+                  placeholder="Enter SGD amount"
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={6} md={6} lg={2} style={{ marginTop: "5px"}}>
+              <Form.Group controlId="myrInput">
+                <Form.Label>MYR</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={myrValue}
+                  onChange={handleMyrChange}
+                  placeholder="Enter MYR amount"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Last Updated Timestamp */}
+          <Row>
+            {latestRate?.CIMB?.timestamp && (
+              <div>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                    textAlign: "center",
+                  }}
+                >
+                  Last updated:{" "}
+                  {new Date(latestRate.CIMB.timestamp).toLocaleString()}
+                </p>
+              </div>
+            )}
+          </Row>
+        </Container>
+
+        {/* Chart and Table Section */}
+        <Container>
+          <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 className="h3">Details</h1>
+            <div className="btn-toolbar mb-2 mb-md-0">
+              <div className="btn-group mr-1">
                 <Form.Select
-                  class="form-select btn-outline-secondary"
+                  className="form-select btn-outline-secondary"
                   id="timeframe-select"
                   value={timeFrame}
                   onChange={(e) => setTimeFrame(e.target.value)}
@@ -373,7 +420,10 @@ const CurrencyExchangeApp = () => {
                       tick={{ fontSize: 14 }}
                       interval={2} // Show all ticks
                       tickFormatter={(value, index) => {
-                        if (index === 0 || index === chartData.length - 1) {
+                        if (
+                          index === 0 ||
+                          index === chartData.length - 1
+                        ) {
                           return "";
                         }
                         return ""; // Return an empty string for ticks that are not first or last
@@ -450,7 +500,10 @@ const CurrencyExchangeApp = () => {
                         marginTop: "20px",
                       }}
                     >
-                      <ButtonGroup className="me-2" aria-label="First group">
+                      <ButtonGroup
+                        className="me-2"
+                        aria-label="First group"
+                      >
                         {[...Array(totalPages)].map((_, index) => (
                           <Button
                             key={index}
