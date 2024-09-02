@@ -79,14 +79,6 @@ const CurrencyExchangeApp = () => {
   const [myrToSgdResult, setMyrToSgdResult] = useState(null);
 
   useEffect(() => {
-    const reloadInterval = setTimeout(() => {
-      window.location.reload();
-    }, 60000); // 60000 milliseconds = 1 minute
-    console.log("Reloaded");
-    return () => clearTimeout(reloadInterval); // Cleanup on unmount
-  }, []);
-
-  useEffect(() => {
     fetch(
       "https://raw.githubusercontent.com/likweitan/CIMB-exchange-rates/main/exchange_rates.json"
     )
@@ -401,7 +393,7 @@ const CurrencyExchangeApp = () => {
             </div>
           </div>
           <Row>
-            <Col xs={12} md={6} lg={6}>
+            <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px"}}>
               <div>
                 <h3
                   style={{
@@ -448,18 +440,18 @@ const CurrencyExchangeApp = () => {
                       name="WISE"
                       activeDot={{ r: 5 }}
                     />
-                    <Line
+                    {/* <Line
                       type="monotone"
                       dataKey="PANDAREMITRate"
                       stroke="#FABC3F"
                       name="PANDAREMIT"
                       activeDot={{ r: 5 }}
-                    />
+                    /> */}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </Col>
-            <Col xs={12} md={6} lg={6}>
+            <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px"}}>
               <div>
                 <h3
                   style={{
@@ -477,7 +469,6 @@ const CurrencyExchangeApp = () => {
                         <th>Date</th>
                         <th>CIMB</th>
                         <th>WISE</th>
-                        <th>PANDAREMIT</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -486,7 +477,6 @@ const CurrencyExchangeApp = () => {
                           <td>{row.date}</td>
                           <td>{row.CIMBRate}</td>
                           <td>{row.WISERate}</td>
-                          <td>{row.PANDAREMITRate}</td>
                         </tr>
                       ))}
                     </tbody>
