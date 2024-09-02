@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import * as XLSX from 'xlsx';
 import Form from 'react-bootstrap/Form';
-import FormSelect from 'react-bootstrap/FormSelect'
+import FormSelect from 'react-bootstrap/FormSelect';
 
 const calculateMedian = (data) => {
   const rates = data.map(item => item.CIMBRate).filter(rate => rate !== '-');
@@ -39,7 +39,7 @@ const CurrencyExchangeApp = () => {
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 10;
+  const recordsPerPage = 6; // Set to 5 records per page
   const yAxisDomain = getYAxisDomain(chartData);
 
   useEffect(() => {
@@ -213,52 +213,54 @@ const CurrencyExchangeApp = () => {
                     <YAxis domain={yAxisDomain} />
                     <Tooltip content={customTooltip} />
                     <Legend />
-                    <Line type="monotone" dataKey="CIMBRate" stroke="#8884d8" name="CIMB" />
-                    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" name="WISE" />
+                    <Line type="monotone" dataKey="CIMBRate" stroke="#8884d8" activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </Col>
             <Col xs={12} md={6} lg={6}>
-              <div>
-                <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Historical Data Table</h2>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Datetime</th>
-                      <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>CIMB</th>
-                      <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>WISE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentRecords.map((record, index) => (
-                      <tr key={index}>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{record.date}</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{record.CIMBRate}</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{record.WISERate}</td>
+              <div style={{ marginBottom: '20px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Exchange Rate Data</h2>
+                <div style={{ height: '400px', overflowY: 'auto', marginBottom: '20px' }}>
+                  <table className="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>CIMB Rate</th>
+                        <th>WISE Rate</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div style={{ marginTop: '10px' }}>
-                  <div>
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handlePageChange(i + 1)}
-                        style={{
-                          padding: '5px 10px',
-                          margin: '0 5px',
-                          backgroundColor: currentPage === i + 1 ? '#007bff' : '#f8f9fa',
-                          color: currentPage === i + 1 ? '#fff' : '#000',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px'
-                        }}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
+                    </thead>
+                    <tbody>
+                      {currentRecords.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.CIMBRate}</td>
+                          <td>{row.WISERate}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="pagination">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePageChange(index + 1)}
+                      disabled={currentPage === index + 1}
+                      style={{
+                        padding: '5px 10px',
+                        margin: '0 5px',
+                        backgroundColor: currentPage === index + 1 ? '#007bff' : '#ccc',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
                 </div>
               </div>
             </Col>
