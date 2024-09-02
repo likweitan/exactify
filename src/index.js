@@ -13,6 +13,7 @@ root.render(
   <React.StrictMode>
     <NavBar />
     <CurrencyExchangeApp />
+    <Analytics />
   </React.StrictMode>
 );
 
