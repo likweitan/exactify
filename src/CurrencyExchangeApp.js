@@ -35,7 +35,7 @@ const calculateAverage = (data) => {
   const rates = data
     .map((item) => item.CIMBRate)
     .filter((rate) => rate !== "-");
-  
+
   const total = rates.reduce((sum, rate) => sum + rate, 0);
   return total / rates.length;
 };
@@ -119,23 +119,22 @@ const CurrencyExchangeApp = () => {
         }
         groupedData[key][item.platform] = item.rate;
       });
-  
+
       const processed = Object.keys(groupedData).map((key) => ({
         date: formatDate(new Date(Number(key))),
         CIMBRate: groupedData[key]["CIMB"] || "-",
         WISERate: groupedData[key]["WISE"] || "-",
       }));
-  
+
       // Slice the processed data to include only the last 24 records
       const limitedProcessed = processed.slice(-24);
-  
+
       setChartData(limitedProcessed); // Keep the chart data in ascending order
       setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
     };
-  
+
     processData();
   }, [data, timeFrame]);
-  
 
   const formatDate = (date) => {
     switch (timeFrame) {
@@ -298,9 +297,14 @@ const CurrencyExchangeApp = () => {
           <h1 class="h2">Dashboard</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group mr-2">
-            <Button class="btn btn-sm btn-outline-secondary" style={{ marginRight: 10 }} onClick={exportToExcel}>Export</Button>
-                
-              </div>
+              <Button
+                class="btn btn-sm btn-outline-secondary"
+                style={{ marginRight: 10 }}
+                onClick={exportToExcel}
+              >
+                Export
+              </Button>
+            </div>
             <div class="btn-group mr-1">
               <Form.Select
                 class="form-select btn-outline-secondary"
@@ -330,35 +334,34 @@ const CurrencyExchangeApp = () => {
                   Exchange Rate Chart
                 </h2>
                 <ResponsiveContainer width="100%" height={400}>
-  <LineChart data={chartData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis
-      dataKey="date"
-      tick={{ fontSize: 12 }}
-      interval={0} // Show all ticks
-      tickFormatter={(value, index) => {
-        if (index === 0 || index === chartData.length - 1) {
-          return value;
-        }
-        return ''; // Return an empty string for ticks that are not first or last
-      }}
-      angle={0}
-      textAnchor="start"
-      height={80}
-    />
-    <YAxis domain={yAxisDomain} />
-    <Tooltip content={customTooltip} />
-    <Legend />
-    <Line
-      type="monotone"
-      dataKey="CIMBRate"
-      stroke="#8884d8"
-      activeDot={{ r: 8 }}
-    />
-    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" />
-  </LineChart>
-</ResponsiveContainer>
-
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 12 }}
+                      interval={0} // Show all ticks
+                      tickFormatter={(value, index) => {
+                        if (index === 0 || index === chartData.length - 1) {
+                          return value;
+                        }
+                        return ""; // Return an empty string for ticks that are not first or last
+                      }}
+                      angle={0}
+                      textAnchor="start"
+                      height={80}
+                    />
+                    <YAxis domain={yAxisDomain} />
+                    <Tooltip content={customTooltip} />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="CIMBRate"
+                      stroke="#8884d8"
+                      activeDot={{ r: 8 }}
+                    />
+                    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </Col>
             <Col xs={12} md={6} lg={6}>
@@ -397,29 +400,37 @@ const CurrencyExchangeApp = () => {
                       ))}
                     </tbody>
                   </table>
-                  <div className="pagination" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                  {[...Array(totalPages)].map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handlePageChange(index + 1)}
-                      disabled={currentPage === index + 1}
+                  {totalPages > 1 && (
+                    <div
+                      className="pagination"
                       style={{
-                        padding: "5px 10px",
-                        margin: "0 5px",
-                        backgroundColor:
-                          currentPage === index + 1 ? "#007bff" : "#ccc",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "20px",
                       }}
                     >
-                      {index + 1}
-                    </button>
-                  ))}
+                      {[...Array(totalPages)].map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handlePageChange(index + 1)}
+                          disabled={currentPage === index + 1}
+                          style={{
+                            padding: "5px 10px",
+                            margin: "0 5px",
+                            backgroundColor:
+                              currentPage === index + 1 ? "#007bff" : "#ccc",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                </div>
-                
               </div>
             </Col>
           </Row>
