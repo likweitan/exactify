@@ -12,7 +12,6 @@ import {
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import * as XLSX from "xlsx";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -95,7 +94,7 @@ const CurrencyExchangeApp = () => {
         setLatestRate({
           CIMB: latestCIMB,
           WISE: latestWISE,
-          PANDAREMIT: latestPANDAREMIT
+          PANDAREMIT: latestPANDAREMIT,
         });
       });
   }, []);
@@ -141,7 +140,7 @@ const CurrencyExchangeApp = () => {
         date: formatDate(new Date(Number(key))),
         CIMBRate: groupedData[key]["CIMB"] || "-",
         WISERate: groupedData[key]["WISE"] || "-",
-        PANDAREMITRate: groupedData[key]["PANDAREMIT"] || "-"
+        PANDAREMITRate: groupedData[key]["PANDAREMIT"] || "-",
       }));
 
       // Slice the processed data to include only the last 12 records
@@ -181,9 +180,9 @@ const CurrencyExchangeApp = () => {
   const customTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const formatRate = (rate) => {
-        return typeof rate === 'number' ? rate.toFixed(4) : '-';
+        return typeof rate === "number" ? rate.toFixed(4) : "-";
       };
-  
+
       return (
         <div
           style={{
@@ -201,14 +200,13 @@ const CurrencyExchangeApp = () => {
     }
     return null;
   };
-  
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(tableData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Exchange Rates");
-    XLSX.writeFile(workbook, "exchange_rates.xlsx");
-  };
+  // const exportToExcel = () => {
+  //   const worksheet = XLSX.utils.json_to_sheet(tableData);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Exchange Rates");
+  //   XLSX.writeFile(workbook, "exchange_rates.xlsx");
+  // };
 
   // Pagination calculations
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -259,10 +257,6 @@ const CurrencyExchangeApp = () => {
                     >
                       1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
                     </p>
-                    <p style={{ fontSize: "14px", color: "#666" }}>
-                      Last updated:{" "}
-                      {new Date(latestRate.CIMB.timestamp).toLocaleString()}
-                    </p>
                   </div>
                 </Col>
               )}
@@ -288,10 +282,6 @@ const CurrencyExchangeApp = () => {
                       }}
                     >
                       1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
-                    </p>
-                    <p style={{ fontSize: "14px", color: "#666" }}>
-                      Last updated:{" "}
-                      {new Date(latestRate.WISE.timestamp).toLocaleString()}
                     </p>
                   </div>
                 </Col>
@@ -319,14 +309,19 @@ const CurrencyExchangeApp = () => {
                     >
                       1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR
                     </p>
-                    <p style={{ fontSize: "14px", color: "#666" }}>
-                      Last updated:{" "}
-                      {new Date(
-                        latestRate.PANDAREMIT.timestamp
-                      ).toLocaleString()}
-                    </p>
                   </div>
                 </Col>
+              )}
+
+              {latestRate?.CIMB.timestamp && (
+              <div>
+              <p style={{ fontSize: "14px", color: "#666", textAlign: 'center'  }}>
+                  Last updated:{" "}
+                  {new Date(
+                    latestRate.CIMB.timestamp
+                  ).toLocaleString()}
+                </p>
+                </div>
               )}
             </Row>
             {/* <Row>
@@ -338,12 +333,11 @@ const CurrencyExchangeApp = () => {
           </Container>
         </div>
 
-        
         <Container>
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 class="h3">Details</h1>
-          <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group mr-2">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h3">Details</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+              {/* <div class="btn-group mr-2">
               <Button
                 class="btn btn-sm btn-outline-secondary"
                 style={{ marginRight: 10 }}
@@ -352,22 +346,22 @@ const CurrencyExchangeApp = () => {
               >
                 Export
               </Button>
-            </div>
-            <div class="btn-group mr-1">
-              <Form.Select
-                class="form-select btn-outline-secondary"
-                id="timeframe-select"
-                value={timeFrame}
-                onChange={(e) => setTimeFrame(e.target.value)}
-              >
-                <option value="hour">Hourly</option>
-                <option value="day">Daily</option>
-                <option value="month">Monthly</option>
-                <option value="year">Yearly</option>
-              </Form.Select>
+            </div> */}
+              <div class="btn-group mr-1">
+                <Form.Select
+                  class="form-select btn-outline-secondary"
+                  id="timeframe-select"
+                  value={timeFrame}
+                  onChange={(e) => setTimeFrame(e.target.value)}
+                >
+                  <option value="hour">Hourly</option>
+                  <option value="day">Daily</option>
+                  <option value="month">Monthly</option>
+                  <option value="year">Yearly</option>
+                </Form.Select>
+              </div>
             </div>
           </div>
-        </div>
           <Row>
             <Col xs={12} md={6} lg={6}>
               <div>
@@ -380,22 +374,21 @@ const CurrencyExchangeApp = () => {
                 >
                   Exchange Rate Chart
                 </h3>
-                <ResponsiveContainer width="100%" height={400}>
+                <ResponsiveContainer width="100%" height={345}>
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fontSize: 12 }}
-                      interval={0} // Show all ticks
+                      tick={{ fontSize: 14 }}
+                      interval={2} // Show all ticks
                       tickFormatter={(value, index) => {
                         if (index === 0 || index === chartData.length - 1) {
-                          return value;
+                          return "";
                         }
                         return ""; // Return an empty string for ticks that are not first or last
                       }}
                       angle={0}
                       textAnchor="start"
-                      height={100}
                     />
                     <YAxis domain={yAxisDomain} />
                     <Tooltip content={customTooltip} />
