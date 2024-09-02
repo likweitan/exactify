@@ -14,8 +14,9 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import * as XLSX from "xlsx";
 import Form from "react-bootstrap/Form";
-import FormSelect from "react-bootstrap/FormSelect";
-import Button from "react-bootstrap/Button";
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
 
 const calculateMedian = (data) => {
   const rates = data
@@ -411,25 +412,18 @@ const CurrencyExchangeApp = () => {
                         marginTop: "20px",
                       }}
                     >
+                      <ButtonGroup className="me-2" aria-label="First group">
                       {[...Array(totalPages)].map((_, index) => (
-                        <button
+                        <Button
                           key={index}
                           onClick={() => handlePageChange(index + 1)}
                           disabled={currentPage === index + 1}
-                          style={{
-                            padding: "5px 10px",
-                            margin: "0 5px",
-                            backgroundColor:
-                              currentPage === index + 1 ? "#007bff" : "#ccc",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                          }}
+                          variant="secondary"
                         >
                           {index + 1}
-                        </button>
+                        </Button>
                       ))}
+                      </ButtonGroup>
                     </div>
                   )}
                 </div>
