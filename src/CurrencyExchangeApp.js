@@ -158,7 +158,7 @@ const CurrencyExchangeApp = () => {
       }));
 
       // Slice the processed data to include only the last 12 records
-      const limitedProcessed = processed.slice(-12);
+      const limitedProcessed = processed.slice(-24);
 
       setChartData(limitedProcessed); // Keep the chart data in ascending order
       setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
@@ -424,7 +424,7 @@ const CurrencyExchangeApp = () => {
                       textAnchor="start"
                     />
                     <YAxis domain={yAxisDomain} />
-                    <Tooltip content={customTooltip} />
+                    <Tooltip/>
                     <Legend />
                     <Line
                       type="monotone"
