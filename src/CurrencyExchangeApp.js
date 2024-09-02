@@ -301,6 +301,7 @@ const CurrencyExchangeApp = () => {
                 class="btn btn-sm btn-outline-secondary"
                 style={{ marginRight: 10 }}
                 onClick={exportToExcel}
+                variant="secondary"
               >
                 Export
               </Button>
