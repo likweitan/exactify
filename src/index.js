@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';  // Import Bootstrap CSS
 import CurrencyExchangeApp from './CurrencyExchangeApp';
 import NavBar from './NavBar';
+import Footer from './Footer';
 import { Analytics } from "@vercel/analytics/react"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -13,6 +14,7 @@ root.render(
   <React.StrictMode>
     <NavBar />
     <CurrencyExchangeApp />
+    <Footer />
     <Analytics />
   </React.StrictMode>
 );
