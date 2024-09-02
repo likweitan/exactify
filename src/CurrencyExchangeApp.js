@@ -6,13 +6,15 @@ const CurrencyExchangeApp = () => {
   const [timeFrame, setTimeFrame] = useState('day');
   const [processedData, setProcessedData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/likweitan/CIMB-exchange-rates/main/exchange_rates.json')
       .then(response => response.json())
       .then(jsonData => {
         const formattedData = jsonData.map(item => ({
-          timestamp: item.timestamp, // Convert to milliseconds
+          timestamp: item.timestamp,
           rate: parseFloat(item.exchange_rate)
         })).sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp descending
         setData(formattedData);
@@ -93,85 +95,116 @@ const CurrencyExchangeApp = () => {
     return null;
   };
 
+  // Pagination calculations
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = processedData.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(processedData.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div>
       <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>MYR Exchange Rate</h1>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>MYR Exchange Rate</h1>
       
-      {latestRate && (
-        <div style={{ 
-          backgroundColor: '#f0f0f0', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          marginBottom: '20px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>Latest Exchange Rate</h2>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '5px' }}>
-            {latestRate.rate.toFixed(4)} MYR
-          </p>
-          <p style={{ fontSize: '14px', color: '#666' }}>
-            Last updated: {new Date(latestRate.timestamp).toLocaleString()}
-          </p>
+        {latestRate && (
+          <div style={{ 
+            backgroundColor: '#f0f0f0', 
+            padding: '20px', 
+            borderRadius: '8px', 
+            marginBottom: '20px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>Latest Exchange Rate</h2>
+            <p style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '5px' }}>
+              {latestRate.rate.toFixed(4)} MYR
+            </p>
+            <p style={{ fontSize: '14px', color: '#666' }}>
+              Last updated: {new Date(latestRate.timestamp).toLocaleString()}
+            </p>
+          </div>
+        )}
+      
+        <div style={{ marginBottom: '20px' }}>
+          <label htmlFor="timeframe-select" style={{ marginRight: '10px' }}>Select Time Frame:</label>
+          <select
+            id="timeframe-select"
+            value={timeFrame}
+            onChange={(e) => setTimeFrame(e.target.value)}
+            style={{ padding: '5px', borderRadius: '4px' }}
+          >
+            <option value="hour">Hourly</option>
+            <option value="day">Daily</option>
+            <option value="month">Monthly</option>
+            <option value="year">Yearly</option>
+          </select>
         </div>
-      )}
-      
-      <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="timeframe-select" style={{ marginRight: '10px' }}>Select Time Frame:</label>
-        <select
-          id="timeframe-select"
-          value={timeFrame}
-          onChange={(e) => setTimeFrame(e.target.value)}
-          style={{ padding: '5px', borderRadius: '4px' }}
-        >
-          <option value="hour">Hourly</option>
-          <option value="day">Daily</option>
-          <option value="month">Monthly</option>
-          <option value="year">Yearly</option>
-        </select>
-      </div>
 
-      <div style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Exchange Rate Chart</h2>
-        <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={processedData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
-              tick={{ fontSize: 12 }} 
-              interval="preserveStartEnd"
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis />
-            <Tooltip content={customTooltip} />
-            <Legend />
-            <Line type="monotone" dataKey="rate" stroke="#8884d8" name="MYR Exchange Rate" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+        <div style={{ marginBottom: '40px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Exchange Rate Chart</h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={processedData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 12 }} 
+                interval="preserveStartEnd"
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis />
+              <Tooltip content={customTooltip} />
+              <Legend />
+              <Line type="monotone" dataKey="rate" stroke="#8884d8" name="MYR Exchange Rate" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
 
-      <div>
-        <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Historical Data Table</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Date</th>
-              <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>MYR Exchange Rate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {processedData.map((item, index) => (
-              <tr key={index}>
-                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.date}</td>
-                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.rate.toFixed(4)}</td>
+        <div>
+          <h2 style={{ fontSize: '20px', fontWeight: 'semibold', marginBottom: '10px' }}>Historical Data Table</h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Date</th>
+                <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>MYR Exchange Rate</th>
               </tr>
+            </thead>
+            <tbody>
+              {currentRecords.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.date}</td>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.rate.toFixed(4)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {/* Pagination controls */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(index + 1)}
+                style={{
+                  padding: '5px 10px',
+                  margin: '0 5px',
+                  borderRadius: '4px',
+                  backgroundColor: currentPage === index + 1 ? '#8884d8' : '#f0f0f0',
+                  color: currentPage === index + 1 ? '#fff' : '#000',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                {index + 1}
+              </button>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 };
