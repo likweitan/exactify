@@ -14,9 +14,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import * as XLSX from "xlsx";
 import Form from "react-bootstrap/Form";
-import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 const calculateMedian = (data) => {
   const rates = data
@@ -63,7 +62,7 @@ const CurrencyExchangeApp = () => {
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6; // Set to 5 records per page
+  const recordsPerPage = 6; // Set to 8 records per page
   const yAxisDomain = getYAxisDomain(chartData);
 
   useEffect(() => {
@@ -79,8 +78,25 @@ const CurrencyExchangeApp = () => {
             platform: item.platform,
           }))
           .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp descending
+
         setData(formattedData.reverse());
-        setLatestRate(formattedData.at(-1)); // Set the latest rate
+        console.log(formattedData);
+        // Determine the latest rates for CIMB and WISE
+        const latestCIMB = formattedData
+          .filter((item) => item.platform === "CIMB")
+          .at(-1);
+        const latestWISE = formattedData
+          .filter((item) => item.platform === "WISE")
+          .at(-1);
+        const latestPANDAREMIT = formattedData
+          .filter((item) => item.platform === "PANDAREMIT")
+          .at(-1);
+
+        setLatestRate({
+          CIMB: latestCIMB,
+          WISE: latestWISE,
+          PANDAREMIT: latestPANDAREMIT
+        });
       });
   }, []);
 
@@ -125,10 +141,11 @@ const CurrencyExchangeApp = () => {
         date: formatDate(new Date(Number(key))),
         CIMBRate: groupedData[key]["CIMB"] || "-",
         WISERate: groupedData[key]["WISE"] || "-",
+        PANDAREMITRate: groupedData[key]["PANDAREMIT"] || "-"
       }));
 
-      // Slice the processed data to include only the last 24 records
-      const limitedProcessed = processed.slice(-24);
+      // Slice the processed data to include only the last 12 records
+      const limitedProcessed = processed.slice(-12);
 
       setChartData(limitedProcessed); // Keep the chart data in ascending order
       setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
@@ -163,6 +180,10 @@ const CurrencyExchangeApp = () => {
 
   const customTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const formatRate = (rate) => {
+        return typeof rate === 'number' ? rate.toFixed(4) : '-';
+      };
+  
       return (
         <div
           style={{
@@ -172,23 +193,15 @@ const CurrencyExchangeApp = () => {
           }}
         >
           <p>{formatDate(new Date(payload[0].payload.date))}</p>
-          <p>
-            CIMB:{" "}
-            {payload[0].payload.CIMBRate !== "-"
-              ? payload[0].payload.CIMBRate.toFixed(4)
-              : "-"}
-          </p>
-          <p>
-            WISE:{" "}
-            {payload[0].payload.WISERate !== "-"
-              ? payload[0].payload.WISERate.toFixed(4)
-              : "-"}
-          </p>
+          <p>CIMB: {formatRate(payload[0].payload.CIMBRate)}</p>
+          <p>WISE: {formatRate(payload[0].payload.WISERate)}</p>
+          <p>PANDAREMIT: {formatRate(payload[0].payload.PANDAREMITRate)}</p>
         </div>
       );
     }
     return null;
   };
+  
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(tableData);
@@ -211,7 +224,7 @@ const CurrencyExchangeApp = () => {
     <div>
       <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
         <div>
-          <h1
+          {/* <h1
             style={{
               fontSize: "24px",
               fontWeight: "bold",
@@ -219,12 +232,12 @@ const CurrencyExchangeApp = () => {
             }}
           >
             SGD - MYR Exchange Rate
-          </h1>
+          </h1> */}
 
           <Container>
             <Row>
-              <Col xs={12} md={6} lg={6}>
-                {latestRate && (
+              {latestRate?.CIMB && (
+                <Col xs={12} md={6} lg={4}>
                   <div
                     style={{
                       backgroundColor: "#EECAD5",
@@ -235,7 +248,7 @@ const CurrencyExchangeApp = () => {
                     }}
                   >
                     <h2 style={{ fontSize: "18px", marginBottom: "10px" }}>
-                      CIMB Latest Exchange Rate
+                      CIMB
                     </h2>
                     <p
                       style={{
@@ -244,17 +257,17 @@ const CurrencyExchangeApp = () => {
                         marginBottom: "5px",
                       }}
                     >
-                      1 SGD = {latestRate.rate.toFixed(4)} MYR
+                      1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
                     </p>
                     <p style={{ fontSize: "14px", color: "#666" }}>
                       Last updated:{" "}
-                      {new Date(latestRate.timestamp).toLocaleString()}
+                      {new Date(latestRate.CIMB.timestamp).toLocaleString()}
                     </p>
                   </div>
-                )}
-              </Col>
-              <Col xs={12} md={6} lg={6}>
-                {latestRate && (
+                </Col>
+              )}
+              {latestRate?.WISE && (
+                <Col xs={12} md={6} lg={4}>
                   <div
                     style={{
                       backgroundColor: "#F6EACB",
@@ -265,7 +278,7 @@ const CurrencyExchangeApp = () => {
                     }}
                   >
                     <h2 style={{ fontSize: "18px", marginBottom: "10px" }}>
-                      WISE Latest Exchange Rate
+                      WISE
                     </h2>
                     <p
                       style={{
@@ -274,15 +287,47 @@ const CurrencyExchangeApp = () => {
                         marginBottom: "5px",
                       }}
                     >
-                      1 SGD = {latestRate.rate.toFixed(4)} MYR
+                      1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
                     </p>
                     <p style={{ fontSize: "14px", color: "#666" }}>
                       Last updated:{" "}
-                      {new Date(latestRate.timestamp).toLocaleString()}
+                      {new Date(latestRate.WISE.timestamp).toLocaleString()}
                     </p>
                   </div>
-                )}
-              </Col>
+                </Col>
+              )}
+              {latestRate?.PANDAREMIT && (
+                <Col xs={12} md={6} lg={4}>
+                  <div
+                    style={{
+                      backgroundColor: "#D1E9F6",
+                      padding: "20px",
+                      borderRadius: "8px",
+                      marginBottom: "20px",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    <h2 style={{ fontSize: "18px", marginBottom: "10px" }}>
+                      PANDAREMIT
+                    </h2>
+                    <p
+                      style={{
+                        fontSize: "24px",
+                        fontWeight: "bold",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR
+                    </p>
+                    <p style={{ fontSize: "14px", color: "#666" }}>
+                      Last updated:{" "}
+                      {new Date(
+                        latestRate.PANDAREMIT.timestamp
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                </Col>
+              )}
             </Row>
             {/* <Row>
             <p style={{ fontSize: "14px", color: "#666", textAlign: 'center' }}>
@@ -361,9 +406,20 @@ const CurrencyExchangeApp = () => {
                       stroke="#982B1C"
                       activeDot={{ r: 5 }}
                     />
-                    <Line type="monotone" dataKey="WISERate" stroke="#1A4870"
+                    <Line
+                      type="monotone"
+                      dataKey="WISERate"
+                      stroke="#1A4870"
                       name="WISE"
-                      activeDot={{ r: 5 }} />
+                      activeDot={{ r: 5 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="PANDAREMITRate"
+                      stroke="#FABC3F"
+                      name="PANDAREMIT"
+                      activeDot={{ r: 5 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -392,6 +448,7 @@ const CurrencyExchangeApp = () => {
                         <th>Date</th>
                         <th>CIMB</th>
                         <th>WISE</th>
+                        <th>PANDAREMIT</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -400,6 +457,7 @@ const CurrencyExchangeApp = () => {
                           <td>{row.date}</td>
                           <td>{row.CIMBRate}</td>
                           <td>{row.WISERate}</td>
+                          <td>{row.PANDAREMITRate}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -414,16 +472,16 @@ const CurrencyExchangeApp = () => {
                       }}
                     >
                       <ButtonGroup className="me-2" aria-label="First group">
-                      {[...Array(totalPages)].map((_, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => handlePageChange(index + 1)}
-                          disabled={currentPage === index + 1}
-                          variant="secondary"
-                        >
-                          {index + 1}
-                        </Button>
-                      ))}
+                        {[...Array(totalPages)].map((_, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => handlePageChange(index + 1)}
+                            disabled={currentPage === index + 1}
+                            variant="secondary"
+                          >
+                            {index + 1}
+                          </Button>
+                        ))}
                       </ButtonGroup>
                     </div>
                   )}
