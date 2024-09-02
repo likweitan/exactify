@@ -435,13 +435,7 @@ const CurrencyExchangeApp = () => {
                 >
                   Exchange Rate Data
                 </h3>
-                <div
-                  style={{
-                    height: "400px",
-                    overflowY: "auto",
-                    marginBottom: "20px",
-                  }}
-                >
+                <div>
                   <table className="table table-striped">
                     <thead>
                       <tr>
