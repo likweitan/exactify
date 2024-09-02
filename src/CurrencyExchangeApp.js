@@ -31,9 +31,18 @@ const calculateMedian = (data) => {
   }
 };
 
+const calculateAverage = (data) => {
+  const rates = data
+    .map((item) => item.CIMBRate)
+    .filter((rate) => rate !== "-");
+  
+  const total = rates.reduce((sum, rate) => sum + rate, 0);
+  return total / rates.length;
+};
+
 const getYAxisDomain = (data) => {
-  const median = calculateMedian(data);
-  const range = 0.05; // Range around the median (5% in this case)
+  const average = calculateAverage(data);
+  const range = 0.05; // Range around the average (5% in this case)
   const rates = data
     .map((item) => item.CIMBRate)
     .filter((rate) => rate !== "-");
@@ -41,8 +50,8 @@ const getYAxisDomain = (data) => {
   const minRate = Math.min(...rates);
 
   return [
-    Math.max(median - (median - minRate) * range, minRate),
-    Math.min(median + (maxRate - median) * range, maxRate),
+    Math.max(average - (average - minRate) * range, minRate),
+    Math.min(average + (maxRate - average) * range, maxRate),
   ];
 };
 
@@ -110,19 +119,23 @@ const CurrencyExchangeApp = () => {
         }
         groupedData[key][item.platform] = item.rate;
       });
-
+  
       const processed = Object.keys(groupedData).map((key) => ({
         date: formatDate(new Date(Number(key))),
         CIMBRate: groupedData[key]["CIMB"] || "-",
         WISERate: groupedData[key]["WISE"] || "-",
       }));
-
-      setChartData(processed); // Keep the chart data in ascending order
-      setTableData([...processed].reverse()); // Reverse the data for the table
+  
+      // Slice the processed data to include only the last 24 records
+      const limitedProcessed = processed.slice(-24);
+  
+      setChartData(limitedProcessed); // Keep the chart data in ascending order
+      setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
     };
-
+  
     processData();
   }, [data, timeFrame]);
+  
 
   const formatDate = (date) => {
     switch (timeFrame) {
@@ -317,28 +330,35 @@ const CurrencyExchangeApp = () => {
                   Exchange Rate Chart
                 </h2>
                 <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 12 }}
-                      interval="preserveStartEnd"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                    />
-                    <YAxis domain={yAxisDomain} />
-                    <Tooltip content={customTooltip} />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="CIMBRate"
-                      stroke="#8884d8"
-                      activeDot={{ r: 8 }}
-                    />
-                    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" />
-                  </LineChart>
-                </ResponsiveContainer>
+  <LineChart data={chartData}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis
+      dataKey="date"
+      tick={{ fontSize: 12 }}
+      interval={0} // Show all ticks
+      tickFormatter={(value, index) => {
+        if (index === 0 || index === chartData.length - 1) {
+          return value;
+        }
+        return ''; // Return an empty string for ticks that are not first or last
+      }}
+      angle={0}
+      textAnchor="start"
+      height={80}
+    />
+    <YAxis domain={yAxisDomain} />
+    <Tooltip content={customTooltip} />
+    <Legend />
+    <Line
+      type="monotone"
+      dataKey="CIMBRate"
+      stroke="#8884d8"
+      activeDot={{ r: 8 }}
+    />
+    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" />
+  </LineChart>
+</ResponsiveContainer>
+
               </div>
             </Col>
             <Col xs={12} md={6} lg={6}>
@@ -377,7 +397,7 @@ const CurrencyExchangeApp = () => {
                       ))}
                     </tbody>
                   </table>
-                  <div className="pagination">
+                  <div className="pagination" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                   {[...Array(totalPages)].map((_, index) => (
                     <button
                       key={index}
