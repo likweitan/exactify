@@ -57,7 +57,7 @@ const getYAxisDomain = (data) => {
 
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
-  const [timeFrame, setTimeFrame] = useState("day");
+  const [timeFrame, setTimeFrame] = useState("hour");
   const [chartData, setChartData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
@@ -394,7 +394,7 @@ const CurrencyExchangeApp = () => {
                       }}
                       angle={0}
                       textAnchor="start"
-                      height={80}
+                      height={100}
                     />
                     <YAxis domain={yAxisDomain} />
                     <Tooltip content={customTooltip} />
