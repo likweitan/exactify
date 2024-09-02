@@ -222,7 +222,7 @@ const CurrencyExchangeApp = () => {
 
   return (
     <div>
-      <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+      <div style={{ padding: "20px" }}>
         <div>
           {/* <h1
             style={{
