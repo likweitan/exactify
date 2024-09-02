@@ -15,6 +15,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Card from "react-bootstrap/Card";
 
 const calculateMedian = (data) => {
   const rates = data
@@ -233,10 +234,10 @@ const CurrencyExchangeApp = () => {
           </h1> */}
 
           <Container>
-            <Row>
+            <Row style={{ marginBottom: "10px" }}>
               {latestRate?.CIMB && (
-                <Col xs={12} md={6} lg={4}>
-                  <div
+                <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
+                  {/* <div
                     style={{
                       backgroundColor: "#EECAD5",
                       padding: "20px",
@@ -257,71 +258,47 @@ const CurrencyExchangeApp = () => {
                     >
                       1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
                     </p>
-                  </div>
+                  </div> */}
+                  <Card style={{ width: "100%" }}>
+                    <Card.Body>
+                      <Card.Title>
+                      1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">CIMB
+                      </Card.Subtitle>
+                      {/* <Card.Text>
+                        Some quick example text to build on the card title and
+                        make up the bulk of the card's content.
+                      </Card.Text>
+                      <Card.Link href="#">Card Link</Card.Link>
+                      <Card.Link href="#">Another Link</Card.Link> */}
+                    </Card.Body>
+                  </Card>
                 </Col>
               )}
               {latestRate?.WISE && (
-                <Col xs={12} md={6} lg={4}>
-                  <div
-                    style={{
-                      backgroundColor: "#F6EACB",
-                      padding: "20px",
-                      borderRadius: "8px",
-                      marginBottom: "20px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <h2 style={{ fontSize: "18px", marginBottom: "10px" }}>
-                      WISE
-                    </h2>
-                    <p
-                      style={{
-                        fontSize: "24px",
-                        fontWeight: "bold",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
-                    </p>
-                  </div>
+                <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }} >
+                  <Card style={{ width: "100%" }}>
+                    <Card.Body>
+                      <Card.Title>
+                      1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">
+                        WISE
+                      </Card.Subtitle>
+                    </Card.Body>
+                  </Card>
                 </Col>
               )}
               {latestRate?.PANDAREMIT && (
-                <Col xs={12} md={6} lg={4}>
-                  <div
-                    style={{
-                      backgroundColor: "#D1E9F6",
-                      padding: "20px",
-                      borderRadius: "8px",
-                      marginBottom: "20px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <h2 style={{ fontSize: "18px", marginBottom: "10px" }}>
-                      PANDAREMIT
-                    </h2>
-                    <p
-                      style={{
-                        fontSize: "24px",
-                        fontWeight: "bold",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR
-                    </p>
-                  </div>
+                <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }} >
+                  <Card style={{ width: "100%"}}>
+                    <Card.Body>
+                      <Card.Title>
+                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">PANDAREMIT
+                      </Card.Subtitle>
+                    </Card.Body>
+                  </Card>
                 </Col>
-              )}
-
-              {latestRate?.CIMB.timestamp && (
-              <div>
-              <p style={{ fontSize: "14px", color: "#666", textAlign: 'center'  }}>
-                  Last updated:{" "}
-                  {new Date(
-                    latestRate.CIMB.timestamp
-                  ).toLocaleString()}
-                </p>
-                </div>
               )}
             </Row>
             {/* <Row>
@@ -330,6 +307,20 @@ const CurrencyExchangeApp = () => {
                       {new Date(latestRate.timestamp).toLocaleString()}
                     </p>
             </Row> */}
+            <Row>{latestRate?.CIMB.timestamp && (
+                <div>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      color: "#666",
+                      textAlign: "center",
+                    }}
+                  >
+                    Last updated:{" "}
+                    {new Date(latestRate.CIMB.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              )}</Row>
           </Container>
         </div>
 
