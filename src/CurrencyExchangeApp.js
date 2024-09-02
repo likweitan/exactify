@@ -172,13 +172,13 @@ const CurrencyExchangeApp = () => {
         >
           <p>{formatDate(new Date(payload[0].payload.date))}</p>
           <p>
-            CIMB Rate:{" "}
+            CIMB:{" "}
             {payload[0].payload.CIMBRate !== "-"
               ? payload[0].payload.CIMBRate.toFixed(4)
               : "-"}
           </p>
           <p>
-            WISE Rate:{" "}
+            WISE:{" "}
             {payload[0].payload.WISERate !== "-"
               ? payload[0].payload.WISERate.toFixed(4)
               : "-"}
@@ -292,9 +292,8 @@ const CurrencyExchangeApp = () => {
           </Container>
         </div>
 
-        <div style={{ marginBottom: "20px" }}></div>
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 class="h2">Dashboard</h1>
+          <h1 class="h3">Details</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group mr-2">
               <Button
@@ -324,7 +323,7 @@ const CurrencyExchangeApp = () => {
           <Row>
             <Col xs={12} md={6} lg={6}>
               <div style={{ marginBottom: "40px" }}>
-                <h2
+                <h3
                   style={{
                     fontSize: "20px",
                     fontWeight: "semibold",
@@ -332,7 +331,7 @@ const CurrencyExchangeApp = () => {
                   }}
                 >
                   Exchange Rate Chart
-                </h2>
+                </h3>
                 <ResponsiveContainer width="100%" height={400}>
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -356,17 +355,20 @@ const CurrencyExchangeApp = () => {
                     <Line
                       type="monotone"
                       dataKey="CIMBRate"
-                      stroke="#8884d8"
-                      activeDot={{ r: 8 }}
+                      name="CIMB"
+                      stroke="#982B1C"
+                      activeDot={{ r: 5 }}
                     />
-                    <Line type="monotone" dataKey="WISERate" stroke="#82ca9d" />
+                    <Line type="monotone" dataKey="WISERate" stroke="#1A4870"
+                      name="WISE"
+                      activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </Col>
             <Col xs={12} md={6} lg={6}>
               <div style={{ marginBottom: "20px" }}>
-                <h2
+                <h3
                   style={{
                     fontSize: "20px",
                     fontWeight: "semibold",
@@ -374,7 +376,7 @@ const CurrencyExchangeApp = () => {
                   }}
                 >
                   Exchange Rate Data
-                </h2>
+                </h3>
                 <div
                   style={{
                     height: "400px",
