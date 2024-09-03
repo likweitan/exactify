@@ -21,7 +21,7 @@ root.render(
         <Route path="/exchange" element={<CurrencyExchangeApp />} />
         <Route path="/loancalculator" element={<LoanCalculator />} />
       </Routes>
-      <Footer />
+      <Footer/>
       <Analytics />
     </Router>
   </React.StrictMode>
