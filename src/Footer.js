@@ -3,10 +3,10 @@ import { Button, Container, Col, Row, Form } from "react-bootstrap";
 const Footer = () => {
   return (
     <div style={{ textAlign: "center", fontSize: "12px" }}>
-      <footer className="bg-light text-dark mt-auto">
-        <Container>
+      <footer className="bg-light text-dark mt-5">
+        <Container fluid>
           <div class="inner">
-            <p>
+            <p className="mt-2 mb-1">
               Made by <a href="https://github.com/likweitan">@likweitan</a>.
             </p>
             <p>

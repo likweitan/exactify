@@ -289,6 +289,33 @@ const CurrencyExchangeApp = () => {
   return (
     <div>
       <Container>
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
+          <h1 className="h3">Latest Rates</h1>
+          <div className="btn-toolbar mb-md-0">
+            <div className="btn-group mr-1">
+            {latestRate?.CIMB?.timestamp && (
+            <div>
+              <p className="mb-0"
+                style={{
+                  fontSize: "14px",
+                  color: "#666",
+                }}
+              >
+                Last updated:{" "}
+                </p>
+                <p className="mb-1"
+                style={{
+                  fontSize: "14px",
+                  color: "#666",
+                }}
+              >
+                {new Date(latestRate.CIMB.timestamp).toLocaleString()}
+              </p>
+            </div>
+          )}
+            </div>
+          </div>
+        </div>
         {/* Latest Rates Cards */}
         <Row class="mb-1">
           {latestRate?.CIMB && (
@@ -369,29 +396,9 @@ const CurrencyExchangeApp = () => {
           </Col>
         </Row>
 
-        {/* Last Updated Timestamp */}
-        <Row>
-          {latestRate?.CIMB?.timestamp && (
-            <div>
-              <p
-                style={{
-                  fontSize: "14px",
-                  color: "#666",
-                  textAlign: "center",
-                }}
-              >
-                Last updated:{" "}
-                {new Date(latestRate.CIMB.timestamp).toLocaleString()}
-              </p>
-            </div>
-          )}
-        </Row>
-      </Container>
-
       {/* Chart and Table Section */}
-      <Container>
-        <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 className="h3">Details</h1>
+        <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
+          <h1 className="h3">Historical Rates</h1>
           <div className="btn-toolbar mb-2 mb-md-0">
             <div className="btn-group mr-1">
               <Form.Select
@@ -412,7 +419,7 @@ const CurrencyExchangeApp = () => {
         <Row>
           <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px" }}>
             <div>
-              <h3
+              {/* <h3
                 style={{
                   fontSize: "20px",
                   fontWeight: "semibold",
@@ -420,7 +427,7 @@ const CurrencyExchangeApp = () => {
                 }}
               >
                 Exchange Rate Chart
-              </h3>
+              </h3> */}
               <ResponsiveContainer width="100%" height={320}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -464,9 +471,9 @@ const CurrencyExchangeApp = () => {
               </ResponsiveContainer>
             </div>
           </Col>
-          <Col xs={12} md={6} lg={6} style={{ marginBottom: "80px" }}>
+          <Col xs={12} md={6} lg={6} className="mb-1">
             <div>
-              <h3
+              {/* <h3
                 style={{
                   fontSize: "20px",
                   fontWeight: "semibold",
@@ -474,7 +481,7 @@ const CurrencyExchangeApp = () => {
                 }}
               >
                 Exchange Rate Data
-              </h3>
+              </h3> */}
               <div>
                 <table className="table table-striped">
                   <thead>
@@ -500,7 +507,6 @@ const CurrencyExchangeApp = () => {
                     style={{
                       display: "flex",
                       justifyContent: "center",
-                      marginTop: "20px",
                     }}
                   >
                     <ButtonGroup className="me-2" aria-label="First group">
