@@ -156,8 +156,8 @@ const CurrencyExchangeApp = () => {
         PANDAREMITRate: groupedData[key]["PANDAREMIT"] || "-",
       }));
 
-      // Slice the processed data to include only the last 12 records
-      const limitedProcessed = processed.slice(-24);
+      // Slice the processed data to include only the last 48 records
+      const limitedProcessed = processed.slice(-48);
 
       setChartData(limitedProcessed); // Keep the chart data in ascending order
       setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
