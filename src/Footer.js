@@ -3,7 +3,7 @@ import { Button, Container, Col, Row, Form } from "react-bootstrap";
 const Footer = () => {
   return (
     <div style={{ textAlign: "center", fontSize: "12px" }}>
-      <footer className="bg-light text-dark mt-5">
+      <footer className="bg-white text-dark mt-5">
         <Container fluid>
           <div class="inner">
             <p className="mt-2 mb-1">
