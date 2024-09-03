@@ -392,9 +392,9 @@ const CurrencyExchangeApp = () => {
                   value={timeFrame}
                   onChange={(e) => setTimeFrame(e.target.value)}
                 >
-                  <option value="15min">Past Hours</option>
-                  <option value="hour">Past Day</option>
-                  <option value="day">Past Week</option>
+                  <option value="15min">6 Hours</option>
+                  <option value="hour">1 Day</option>
+                  <option value="day">1 Week</option>
                   {/* <option value="month">Last Month</option> */}
                   {/* <option value="year">Last Year</option> */}
                 </Form.Select>
