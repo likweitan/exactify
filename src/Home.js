@@ -62,24 +62,7 @@ const Home = () => {
             </div>
           </Link>
         </Col>
-        <Col xs={12} md={3}>
-          <Link to="tel:006580290463" className="text-decoration-none">
-            <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-secondary rounded box-shadow">
-              <img
-                class="mr-3"
-                src="https://st2.depositphotos.com/1137361/9653/v/450/depositphotos_96538650-stock-illustration-red-heart-symbol.jpg"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-white lh-100">+65 80290463</h6>
-                <small>KOK ZHI XIANG</small>
-              </div>
-            </div>
-          </Link>
-        </Col>
+        
         {/* <Col xs={6} md={2}>
           <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-dark rounded box-shadow">
             <div class="lh-100">
