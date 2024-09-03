@@ -293,7 +293,7 @@ const CurrencyExchangeApp = () => {
         <Row class="mb-1">
           {latestRate?.CIMB && (
             <Col xs={12} md={6} lg={4}>
-              <div class="d-flex align-items-center p-3 my-3 text-black-50 rounded box-shadow border">
+              <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
                 <img
                   class="mr-3"
                   src="https://companieslogo.com/img/orig/1023.KL.D-54a944fb.png?t=1720244490"
@@ -313,7 +313,7 @@ const CurrencyExchangeApp = () => {
           )}
           {latestRate?.WISE && (
             <Col xs={12} md={6} lg={4}>
-              <div class="d-flex align-items-center p-3 my-3 text-black-50 rounded box-shadow border">
+              <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
                 <img
                   class="mr-3"
                   src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d7c0bb67-155c-4767-9bff-0848c5392cac"
@@ -345,7 +345,7 @@ const CurrencyExchangeApp = () => {
                 </Card>
               </Col>
             )} */}
-          <Col xs={6} md={6} lg={2} style={{ marginTop: "5px" }}>
+          <Col xs={6} md={6} lg={2}>
             <Form.Group controlId="sgdInput">
               <Form.Label>SGD</Form.Label>
               <Form.Control
@@ -356,7 +356,7 @@ const CurrencyExchangeApp = () => {
               />
             </Form.Group>
           </Col>
-          <Col xs={6} md={6} lg={2} style={{ marginTop: "5px" }}>
+          <Col xs={6} md={6} lg={2}>
             <Form.Group controlId="myrInput">
               <Form.Label>MYR</Form.Label>
               <Form.Control
@@ -421,13 +421,12 @@ const CurrencyExchangeApp = () => {
               >
                 Exchange Rate Chart
               </h3>
-              <ResponsiveContainer width="100%" height={345}>
+              <ResponsiveContainer width="100%" height={320}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 14 }}
-                    interval={2} // Show all ticks
+                    interval={5} // Show all ticks
                     tickFormatter={(value, index) => {
                       if (index === 0 || index === chartData.length - 1) {
                         return "";
@@ -439,7 +438,7 @@ const CurrencyExchangeApp = () => {
                   />
                   <YAxis domain={yAxisDomain} />
                   <Tooltip />
-                  <Legend />
+                  <Legend verticalAlign="top" height={36}/>
                   <Line
                     type="monotone"
                     dataKey="CIMBRate"
