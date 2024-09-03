@@ -63,7 +63,7 @@ const Home = () => {
           </Link>
         </Col>
         <Col xs={12} md={3}>
-          <Link to="#" className="text-decoration-none">
+          <Link to="tel:+6580290463" className="text-decoration-none">
             <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-secondary rounded box-shadow">
               <img
                 class="mr-3"
