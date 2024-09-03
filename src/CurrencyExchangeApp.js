@@ -55,7 +55,6 @@ const getYAxisDomain = (data) => {
   ];
 };
 
-
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
   const [timeFrame, setTimeFrame] = useState("hour");
@@ -186,6 +185,14 @@ const CurrencyExchangeApp = () => {
         });
       case "year":
         return date.getFullYear().toString();
+      case "15min":
+        return date.toLocaleString(undefined, {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
       default:
         return date.toLocaleDateString();
     }
@@ -278,12 +285,13 @@ const CurrencyExchangeApp = () => {
       setSgdValue("");
     }
   };
+
   return (
     <div>
       <div style={{ padding: "20px" }}>
-      <Container style={{ marginTop: "20px", marginBottom: "20px" }}>
-          
-        </Container>
+        <Container
+          style={{ marginTop: "20px", marginBottom: "20px" }}
+        ></Container>
         <Container>
           {/* Latest Rates Cards */}
           <Row style={{ marginBottom: "10px" }}>
@@ -329,7 +337,7 @@ const CurrencyExchangeApp = () => {
                 </Card>
               </Col>
             )} */}
-            <Col xs={6} md={6} lg={2} style={{ marginTop: "5px"}}>
+            <Col xs={6} md={6} lg={2} style={{ marginTop: "5px" }}>
               <Form.Group controlId="sgdInput">
                 <Form.Label>SGD</Form.Label>
                 <Form.Control
@@ -340,7 +348,7 @@ const CurrencyExchangeApp = () => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={6} lg={2} style={{ marginTop: "5px"}}>
+            <Col xs={6} md={6} lg={2} style={{ marginTop: "5px" }}>
               <Form.Group controlId="myrInput">
                 <Form.Label>MYR</Form.Label>
                 <Form.Control
@@ -384,16 +392,17 @@ const CurrencyExchangeApp = () => {
                   value={timeFrame}
                   onChange={(e) => setTimeFrame(e.target.value)}
                 >
-                  <option value="hour">Hourly</option>
-                  <option value="day">Daily</option>
-                  <option value="month">Monthly</option>
-                  <option value="year">Yearly</option>
+                  <option value="15min">Past Hours</option>
+                  <option value="hour">Past Day</option>
+                  <option value="day">Past Week</option>
+                  {/* <option value="month">Last Month</option> */}
+                  {/* <option value="year">Last Year</option> */}
                 </Form.Select>
               </div>
             </div>
           </div>
           <Row>
-            <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px"}}>
+            <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px" }}>
               <div>
                 <h3
                   style={{
@@ -412,10 +421,7 @@ const CurrencyExchangeApp = () => {
                       tick={{ fontSize: 14 }}
                       interval={2} // Show all ticks
                       tickFormatter={(value, index) => {
-                        if (
-                          index === 0 ||
-                          index === chartData.length - 1
-                        ) {
+                        if (index === 0 || index === chartData.length - 1) {
                           return "";
                         }
                         return ""; // Return an empty string for ticks that are not first or last
@@ -424,7 +430,7 @@ const CurrencyExchangeApp = () => {
                       textAnchor="start"
                     />
                     <YAxis domain={yAxisDomain} />
-                    <Tooltip/>
+                    <Tooltip />
                     <Legend />
                     <Line
                       type="monotone"
@@ -451,7 +457,7 @@ const CurrencyExchangeApp = () => {
                 </ResponsiveContainer>
               </div>
             </Col>
-            <Col xs={12} md={6} lg={6} style={{ marginBottom: "80px"}}>
+            <Col xs={12} md={6} lg={6} style={{ marginBottom: "80px" }}>
               <div>
                 <h3
                   style={{
@@ -490,10 +496,7 @@ const CurrencyExchangeApp = () => {
                         marginTop: "20px",
                       }}
                     >
-                      <ButtonGroup
-                        className="me-2"
-                        aria-label="First group"
-                      >
+                      <ButtonGroup className="me-2" aria-label="First group">
                         {[...Array(totalPages)].map((_, index) => (
                           <Button
                             key={index}
