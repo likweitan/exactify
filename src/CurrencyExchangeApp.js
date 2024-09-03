@@ -451,7 +451,7 @@ const CurrencyExchangeApp = () => {
                 </ResponsiveContainer>
               </div>
             </Col>
-            <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px"}}>
+            <Col xs={12} md={6} lg={6} style={{ marginBottom: "80px"}}>
               <div>
                 <h3
                   style={{
