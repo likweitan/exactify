@@ -406,6 +406,7 @@ const LoanCalculator = () => {
       <Row>
         <Col md={4}>
           <Form>
+            
             <Form.Label>Loan Amount</Form.Label>
             <InputGroup className="mb-3">
               <InputGroup.Text id="basic-addon2">
@@ -413,31 +414,38 @@ const LoanCalculator = () => {
               </InputGroup.Text>
               <Form.Control
                 type="number"
-                placeholder="Enter loan amount"
+                placeholder=""
                 value={loanAmount}
                 onChange={(e) => setLoanAmount(e.target.value)}
               />
             </InputGroup>
-            <Form.Label>Interest Rate</Form.Label>
+            
+            <Row>
+              <Col>
+              <Form.Label>Interest Rate</Form.Label>
             <InputGroup className="mb-3">
               <Form.Control
                 type="number"
-                placeholder="Enter interest rate"
+                placeholder=""
                 value={interestRate}
                 onChange={(e) => setInterestRate(e.target.value)}
               />
               <InputGroup.Text id="basic-addon2">%</InputGroup.Text>
             </InputGroup>
-            <Form.Label>Loan Term (years)</Form.Label>
+              </Col>
+              <Col>
+              <Form.Label>Loan Term</Form.Label>
             <InputGroup className="mb-3">
               <Form.Control
                 type="number"
-                placeholder="Enter loan term"
+                placeholder=""
                 value={loanTerm}
                 onChange={(e) => setLoanTerm(e.target.value)}
               />
               <InputGroup.Text id="basic-addon2">Years</InputGroup.Text>
             </InputGroup>
+              </Col>
+            </Row>
             <Form.Label>Extra Payment (monthly)</Form.Label>
             <InputGroup className="mb-3">
               <InputGroup.Text id="basic-addon2">
@@ -445,7 +453,7 @@ const LoanCalculator = () => {
               </InputGroup.Text>
               <Form.Control
                 type="number"
-                placeholder="Enter extra payment"
+                placeholder=""
                 value={extraPayment}
                 onChange={(e) => setExtraPayment(e.target.value)}
               />
