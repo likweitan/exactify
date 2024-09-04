@@ -8,6 +8,7 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 import Home from './Home';  // Import the Home component
 import LoanCalculator from './LoanCalculator';
+import CarInsuranceCalculator from './CarInsuranceCalculator';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Analytics } from "@vercel/analytics/react"
 
@@ -20,6 +21,7 @@ root.render(
         <Route path="/" element={<Home />} />
         <Route path="/exchange" element={<CurrencyExchangeApp />} />
         <Route path="/loancalculator" element={<LoanCalculator />} />
+        <Route path="/carinsurance" element={<CarInsuranceCalculator />} />
       </Routes>
       <Footer/>
       <Analytics />

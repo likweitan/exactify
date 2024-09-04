@@ -20,8 +20,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import LoanPieChart from "./LoanPieChart";
-import LoanLineChart from "./LoanLineChart"; // Add this import
+import LoanPieChart from "./LoanPieChart"; // Add this import
 
 const currencies = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -32,7 +31,7 @@ const currencies = [
   { code: "JPY", symbol: "¥", name: "Japanese Yen" },
 ];
 
-const LoanCalculator = () => {
+const CarInsuranceCalculator = () => {
   const [loanAmount, setLoanAmount] = useState("");
   const [interestRate, setInterestRate] = useState("");
   const [loanTerm, setLoanTerm] = useState("");
@@ -178,23 +177,29 @@ const LoanCalculator = () => {
       setSelectedCurrency(currencies[0]);
     };
 
-    // Prepare yearly data for the line chart
     const yearly = [];
-    let yearlyPrincipal = 0;
-    let yearlyInterest = 0;
-    for (let i = 0; i < schedule.length; i++) {
-      yearlyPrincipal += parseFloat(schedule[i].principal);
-      yearlyInterest += parseFloat(schedule[i].interest);
-      if ((i + 1) % 12 === 0 || i === schedule.length - 1) {
-        const year = Math.floor(i / 12) + 1;
-        yearly.push({
-          year,
-          principal: yearlyPrincipal,
-          interest: yearlyInterest,
-          balance: parseFloat(schedule[i].balance),
-        });
-      }
+    for (let i = 0; i < schedule.length; i += 12) {
+      const year = Math.floor(i / 12) + 1;
+      const yearData = schedule.slice(i, i + 12);
+      const yearSum = yearData.reduce(
+        (acc, month) => ({
+          interest: acc.interest + parseFloat(month.interest),
+          principal: acc.principal + parseFloat(month.principal),
+        }),
+        { interest: 0, principal: 0 }
+      );
+
+      yearly.push({
+        year,
+        interest: formatCurrency(
+          ((yearSum.interest / totalPayment) * 100).toFixed(2)
+        ),
+        principal: formatCurrency(
+          ((yearSum.principal / totalPayment) * 100).toFixed(2)
+        ),
+      });
     }
+
     setYearlyData(yearly);
   };
 
@@ -379,7 +384,7 @@ const LoanCalculator = () => {
   return (
     <Container className="mt-3">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-        <h1 className="h3">Home Loan</h1>
+        <h1 className="h3">Loan Calculator</h1>
         <div className="btn-toolbar mb-2 mb-md-0">
           <div className="btn-group mr-1 me-2">
             <Form.Select
@@ -400,8 +405,9 @@ const LoanCalculator = () => {
         </div>
       </div>
       <Row>
-        <Col md={3}>
+        <Col md={4}>
           <Form>
+            
             <Form.Label>Loan Amount</Form.Label>
             <InputGroup className="mb-3">
               <InputGroup.Text id="basic-addon2">
@@ -414,31 +420,31 @@ const LoanCalculator = () => {
                 onChange={(e) => setLoanAmount(e.target.value)}
               />
             </InputGroup>
-
+            
             <Row>
               <Col>
-                <Form.Label>Interest Rate</Form.Label>
-                <InputGroup className="mb-3">
-                  <Form.Control
-                    type="number"
-                    placeholder=""
-                    value={interestRate}
-                    onChange={(e) => setInterestRate(e.target.value)}
-                  />
-                  <InputGroup.Text id="basic-addon2">%</InputGroup.Text>
-                </InputGroup>
+              <Form.Label>Interest Rate</Form.Label>
+            <InputGroup className="mb-3">
+              <Form.Control
+                type="number"
+                placeholder=""
+                value={interestRate}
+                onChange={(e) => setInterestRate(e.target.value)}
+              />
+              <InputGroup.Text id="basic-addon2">%</InputGroup.Text>
+            </InputGroup>
               </Col>
               <Col>
-                <Form.Label>Loan Term</Form.Label>
-                <InputGroup className="mb-3">
-                  <Form.Control
-                    type="number"
-                    placeholder=""
-                    value={loanTerm}
-                    onChange={(e) => setLoanTerm(e.target.value)}
-                  />
-                  <InputGroup.Text id="basic-addon2">Years</InputGroup.Text>
-                </InputGroup>
+              <Form.Label>Loan Term</Form.Label>
+            <InputGroup className="mb-3">
+              <Form.Control
+                type="number"
+                placeholder=""
+                value={loanTerm}
+                onChange={(e) => setLoanTerm(e.target.value)}
+              />
+              <InputGroup.Text id="basic-addon2">Years</InputGroup.Text>
+            </InputGroup>
               </Col>
             </Row>
             <Form.Label>Extra Payment (monthly)</Form.Label>
@@ -490,168 +496,159 @@ const LoanCalculator = () => {
             </div>
           )} */}
         </Col>
-
+        
         {results && (
-          <Col xs={12} md={6} lg={3}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {formatCurrency(results.monthlyPayment)}
-                </h6>
-                <small>Monthly Payment</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {formatCurrency(results.totalInterest)}
-                </h6>
-                <small>Total Interest</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">{results.payoffTime}</h6>
-                <small>Payoff Time</small>
-              </div>
-            </div>
-          </Col>
-        )}
-        {results && (
-          <Col xs={12} md={6} lg={3}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {formatCurrency(results.totalPayment)}
-                </h6>
-                <small>Total Payment</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {formatCurrency(results.annualPayment)}
-                </h6>
-                <small>Annual Payment</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {results.mortgageConstant}
-                </h6>
-                <small>Mortgage Constant</small>
-              </div>
-            </div>
-          </Col>
-        )}
-        {savings && extraPayment && (
-          <Col xs={12} md={6} lg={3}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {formatCurrency(savings.interestSaved)}
-                </h6>
-                <small>Total Interest Saved</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src="/logo.png"
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginRight: "1rem" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  {savings.timeSaved} years
-                </h6>
-                <small>Total Time Saved</small>
-              </div>
-            </div>
-          </Col>
-        )}
-      </Row>
-      {results && (
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-        <h1 className="h3">Payment Schedule</h1>
-      </div>
-      )}
-      <Row>
-        {/* Add the pie chart here */}
-        {results && (
-          <Col md={6}>
-            <LoanPieChart
-              principal={parseFloat(loanAmount)}
-              interest={parseFloat(results.totalInterest)} selectedCurrency={selectedCurrency}
+          <>
+        <Col xs={12} md={6} lg={4}>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
             />
-            {yearlyData.length > 0 && (
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {formatCurrency(results.monthlyPayment)}
+              </h6>
+              <small>Monthly Payment</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {formatCurrency(results.totalInterest)}
+              </h6>
+              <small>Total Interest</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {results.payoffTime}
+              </h6>
+              <small>Payoff Time</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {formatCurrency(savings.interestSaved)}
+              </h6>
+              <small>Total Interest Saved</small>
+            </div>
+          </div>
+        </Col>
+        <Col xs={12} md={6} lg={4}>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+              {formatCurrency(results.totalPayment)}
+              </h6>
+              <small>Total Payment</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {formatCurrency(results.annualPayment)}
+              </h6>
+              <small>Annual Payment</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {results.mortgageConstant}
+              </h6>
+              <small>Mortgage Constant</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+            <img
+              class="mr-3"
+              src="/logo.png"
+              alt=""
+              width="48"
+              height="48"
+              style={{ marginRight: "1rem" }}
+            />
+            <div class="lh-100">
+              <h6 class="mb-0 text-black lh-100">
+                {savings.timeSaved} years
+              </h6>
+              <small>Total Time Saved</small>
+            </div>
+          </div>
+        </Col>
+</>
+)}
+{/* Add the pie chart here */}
+{results && (
+          <Col xs={12} md={6} lg={3}>
+            <Card className="mt-3">
+              <Card.Header as="h6">Loan Breakdown</Card.Header>
+              <Card.Body>
+                <LoanPieChart
+                  principal={parseFloat(loanAmount)}
+                  interest={parseFloat(results.totalInterest)}
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+        )}
+        {amortizationSchedule.length > 0 && (
           <Col md={12}>
-                <LoanLineChart data={yearlyData} selectedCurrency={selectedCurrency} />
-          </Col>
-        )}
-          </Col>
-        )}
-      {amortizationSchedule.length > 0 && (
-          <Col md={6}>
             <Row>
               <Col>
                 <Table hover>
@@ -681,7 +678,6 @@ const LoanCalculator = () => {
             </Row>
           </Col>
         )}
-        
       </Row>
       {/* <Row>
         <Col md={12}>
@@ -715,4 +711,4 @@ const LoanCalculator = () => {
   );
 };
 
-export default LoanCalculator;
+export default CarInsuranceCalculator;

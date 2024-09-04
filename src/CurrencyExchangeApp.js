@@ -318,7 +318,7 @@ const CurrencyExchangeApp = () => {
         {/* Latest Rates Cards */}
         <Row class="mb-1">
           {latestRate?.CIMB && (
-            <Col xs={12} md={6} lg={4}>
+            <Col xs={12} md={6} lg={3}>
               <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
                 <img
                   class="mr-3"
@@ -338,7 +338,7 @@ const CurrencyExchangeApp = () => {
             </Col>
           )}
           {latestRate?.WISE && (
-            <Col xs={12} md={6} lg={4}>
+            <Col xs={12} md={6} lg={3}>
               <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
                 <img
                   class="mr-3"
@@ -427,7 +427,7 @@ const CurrencyExchangeApp = () => {
               >
                 Exchange Rate Chart
               </h3> */}
-              <ResponsiveContainer width="100%" height={320}>
+              <ResponsiveContainer width="100%" height={345}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -444,7 +444,7 @@ const CurrencyExchangeApp = () => {
                   />
                   <YAxis domain={yAxisDomain} />
                   <Tooltip />
-                  <Legend verticalAlign="top" height={36}/>
+                  <Legend />
                   <Line
                     type="monotone"
                     dataKey="CIMBRate"
