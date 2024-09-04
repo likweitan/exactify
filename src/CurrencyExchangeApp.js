@@ -15,7 +15,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Card from "react-bootstrap/Card";
+import Table from "react-bootstrap/Table";
 
 const calculateMedian = (data) => {
   const rates = data
@@ -287,9 +287,8 @@ const CurrencyExchangeApp = () => {
   };
 
   return (
-    <div>
-      <Container>
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
+      <Container className="mt-3">
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
           <h1 className="h3">Latest Rates</h1>
           <div className="btn-toolbar mb-md-0">
             <div className="btn-group mr-1">
@@ -483,7 +482,7 @@ const CurrencyExchangeApp = () => {
                 Exchange Rate Data
               </h3> */}
               <div>
-                <table className="table table-striped">
+                <Table hover>
                   <thead>
                     <tr>
                       <th>Date</th>
@@ -500,7 +499,7 @@ const CurrencyExchangeApp = () => {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </Table>
                 {totalPages > 1 && (
                   <div
                     className="pagination"
@@ -528,7 +527,6 @@ const CurrencyExchangeApp = () => {
           </Col>
         </Row>
       </Container>
-    </div>
   );
 };
 
