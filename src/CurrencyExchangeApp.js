@@ -450,14 +450,14 @@ const CurrencyExchangeApp = () => {
                     dataKey="CIMBRate"
                     name="CIMB"
                     stroke="#982B1C"
-                    activeDot={{ r: 5 }}
+                    dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="WISERate"
                     stroke="#1A4870"
                     name="WISE"
-                    activeDot={{ r: 5 }}
+                    dot={false}
                   />
                   {/* <Line
                       type="monotone"

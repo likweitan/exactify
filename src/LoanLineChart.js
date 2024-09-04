@@ -23,9 +23,9 @@ const LoanLineChart = ({ data, selectedCurrency }) => {
         <YAxis tickFormatter={(value) => formatCurrency(value)} />
         <Tooltip formatter={(value) => formatCurrency(value)} />
         <Legend />
-        <Line type="monotone" dataKey="principal" stroke="#8884d8" activeDot={{ r: 8 }} />
-        <Line type="monotone" dataKey="interest" stroke="#82ca9d" />
-        <Line type="monotone" dataKey="balance" stroke="#ffc658" />
+        <Line type="monotone" dataKey="principal" stroke="#8884d8" dot={false} />
+        <Line type="monotone" dataKey="interest" stroke="#82ca9d" dot={false} />
+        <Line type="monotone" dataKey="balance" stroke="#ffc658" dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );
