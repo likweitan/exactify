@@ -312,6 +312,27 @@ const CurrencyExchangeApp = () => {
     }
   };
 
+  function timeAgo(timestamp) {
+    const now = new Date();
+    const past = new Date(timestamp);
+    const diff = Math.floor((now - past) / 1000); // difference in seconds
+
+    if (diff < 60) {
+      return `${diff} seconds ago`;
+    } else if (diff < 3600) {
+      // less than an hour
+      const minutes = Math.floor(diff / 60);
+      return `${minutes} minutes ago`;
+    } else if (diff < 86400) {
+      // less than a day
+      const hours = Math.floor(diff / 3600);
+      return `${hours} hours ago`;
+    } else {
+      const days = Math.floor(diff / 86400);
+      return `${days} days ago`;
+    }
+  }
+
   return (
     <Container className="mt-3">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
@@ -321,22 +342,13 @@ const CurrencyExchangeApp = () => {
             {latestRate?.CIMB?.timestamp && (
               <div>
                 <p
-                  className="mb-0"
-                  style={{
-                    fontSize: "14px",
-                    color: "#666",
-                  }}
-                >
-                  Last updated:{" "}
-                </p>
-                <p
                   className="mb-1"
                   style={{
                     fontSize: "14px",
                     color: "#666",
                   }}
                 >
-                  {new Date(latestRate.CIMB.timestamp).toLocaleString()}
+                  Updated {timeAgo(latestRate.CIMB.timestamp)}
                 </p>
               </div>
             )}
