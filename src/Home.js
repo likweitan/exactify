@@ -1,18 +1,17 @@
 import React from "react";
-import { Button, Container, Col, Row, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Container, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const navigate = useNavigate();
-
   return (
     <Container>
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom" style={{ marginTop: "1rem" }}>
-        <h1 className="h3">Apps</h1>
+      <div
+        className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom"
+        style={{ marginTop: "1rem" }}
+      >
+        <h1 className="h3">Exactify</h1>
         <div className="btn-toolbar mb-2 mb-md-0">
-          <div className="btn-group mr-1">
-          </div>
+          <div className="btn-group mr-1"></div>
         </div>
       </div>
       {/* <Row>
@@ -62,39 +61,6 @@ const Home = () => {
             </div>
           </Link>
         </Col>
-        
-        {/* <Col xs={6} md={2}>
-          <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-dark rounded box-shadow">
-            <div class="lh-100">
-              <h6 class="mb-0 text-white lh-100">Welcome to Reach</h6>
-              <small>Since 2024</small>
-            </div>
-          </div>
-          </Col>
-          <Col xs={6} md={2}>
-          <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-dark rounded box-shadow">
-            <div class="lh-100">
-              <h6 class="mb-0 text-white lh-100">Welcome to Reach</h6>
-              <small>Since 2024</small>
-            </div>
-          </div>
-          </Col>
-          <Col xs={6} md={2}>
-          <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-dark rounded box-shadow">
-            <div class="lh-100">
-              <h6 class="mb-0 text-white lh-100">Welcome to Reach</h6>
-              <small>Since 2024</small>
-            </div>
-          </div>
-          </Col>
-          <Col xs={6} md={2}>
-          <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-dark rounded box-shadow">
-            <div class="lh-100">
-              <h6 class="mb-0 text-white lh-100">Welcome to Reach</h6>
-              <small>Since 2024</small>
-            </div>
-          </div>
-          </Col> */}
       </Row>
     </Container>
   );

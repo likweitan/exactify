@@ -41,6 +41,7 @@ const NavBar = () => {
             height="30"
             className="d-inline-block align-top"
           />{" "}
+          <text style={{ fontFamily: "cursive" }}>Exactify</text>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
