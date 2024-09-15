@@ -1,4 +1,4 @@
-import Container from 'react-bootstrap/Container';
+import Container from "react-bootstrap/Container";
 // import Nav from 'react-bootstrap/Nav';
 // import Navbar from 'react-bootstrap/Navbar';
 
@@ -21,30 +21,40 @@ import Container from 'react-bootstrap/Container';
 // }
 // export default NavBar;
 
-import React from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Navbar, Nav } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   return (
-    <Navbar bg="light" expand="lg">
-     <Container>
-      <Navbar.Brand as={Link} to="/"><img
-              alt=""
-              src="/logo.png"
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />{' '}</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
-          {/* <Nav.Link as={Link} to="/">Home</Nav.Link> */}
-          <Nav.Link as={Link} to="/exchange">Exchange Rates</Nav.Link>
-          <Nav.Link as={Link} to="/loancalculator">Loan Calculator</Nav.Link>
-          {/* <Nav.Link as={Link} to="/carinsurance">Car Insurance</Nav.Link> */}
-        </Nav>
-      </Navbar.Collapse>
+    <Navbar
+      style={{ backgroundSize: "0", backgroundColor: "#EEEEEE" }}
+      data-bs-theme="light"
+      expand="lg"
+    >
+      <Container>
+        <Navbar.Brand as={Link} to="/">
+          <img
+            alt=""
+            src="/logo.png"
+            width="30"
+            height="30"
+            className="d-inline-block align-top"
+          />{" "}
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="mr-auto">
+            {/* <Nav.Link as={Link} to="/">Home</Nav.Link> */}
+            <Nav.Link as={Link} to="/exchange">
+              Exchange Rates
+            </Nav.Link>
+            <Nav.Link as={Link} to="/loancalculator">
+              Loan Calculator
+            </Nav.Link>
+            {/* <Nav.Link as={Link} to="/carinsurance">Car Insurance</Nav.Link> */}
+          </Nav>
+        </Navbar.Collapse>
       </Container>
     </Navbar>
   );
