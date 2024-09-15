@@ -32,7 +32,7 @@ const Home = () => {
         style={{ marginTop: "1rem" }}
       ></div>
       <Row className="justify-content-start">
-        <Col xs={3} sm={4} md={2} lg={1}>
+        <Col xs={3} sm={4} md={2} lg={2}>
           <AppIcon
             to="/exchange"
             icon="https://images.vexels.com/media/users/3/146882/isolated/lists/7525685ed67fa782b7d851273e1264c7-currency-exchange.png"
@@ -41,7 +41,7 @@ const Home = () => {
             bgColor="#F5F7F8"
           />
         </Col>
-        <Col xs={3} sm={4} md={2} lg={1}>
+        <Col xs={3} sm={4} md={2} lg={2}>
           <AppIcon
             to="/loancalculator"
             icon="https://ps.w.org/loan-calculator-wp/assets/icon-256x256.png?rev=2611572"
