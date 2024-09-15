@@ -145,17 +145,43 @@ const CurrencyExchangeApp = () => {
           default:
             key = date.getTime();
         }
+
+        // Initialize the structure for this key if it doesn't exist
         if (!groupedData[key]) {
           groupedData[key] = {};
         }
-        groupedData[key][item.platform] = item.rate;
+
+        // If groupedData[key][item.platform] is not an object, initialize it as an object
+        if (
+          !groupedData[key][item.platform] ||
+          typeof groupedData[key][item.platform] !== "object"
+        ) {
+          groupedData[key][item.platform] = { sum: 0, count: 0 };
+        }
+
+        // Aggregate the rate (sum and count)
+        groupedData[key][item.platform].sum += item.rate;
+        groupedData[key][item.platform].count += 1;
       });
 
       const processed = Object.keys(groupedData).map((key) => ({
         date: formatDate(new Date(Number(key))),
-        CIMBRate: groupedData[key]["CIMB"] || "-",
-        WISERate: groupedData[key]["WISE"] || "-",
-        PANDAREMITRate: groupedData[key]["PANDAREMIT"] || "-",
+        CIMBRate: groupedData[key]["CIMB"]
+          ? (
+              groupedData[key]["CIMB"].sum / groupedData[key]["CIMB"].count
+            ).toFixed(4)
+          : "-",
+        WISERate: groupedData[key]["WISE"]
+          ? (
+              groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count
+            ).toFixed(4)
+          : "-",
+        PANDAREMITRate: groupedData[key]["PANDAREMIT"]
+          ? (
+              groupedData[key]["PANDAREMIT"].sum /
+              groupedData[key]["PANDAREMIT"].count
+            ).toFixed(2)
+          : "-",
       }));
 
       // Slice the processed data to include only the last 48 records
@@ -289,77 +315,79 @@ const CurrencyExchangeApp = () => {
   };
 
   return (
-      <Container className="mt-3">
+    <Container className="mt-3">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 className="h3">Latest Rates</h1>
-          <div className="btn-toolbar mb-md-0">
-            <div className="btn-group mr-1">
+        <h1 className="h3">Latest Rates</h1>
+        <div className="btn-toolbar mb-md-0">
+          <div className="btn-group mr-1">
             {latestRate?.CIMB?.timestamp && (
-            <div>
-              <p className="mb-0"
-                style={{
-                  fontSize: "14px",
-                  color: "#666",
-                }}
-              >
-                Last updated:{" "}
+              <div>
+                <p
+                  className="mb-0"
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                  }}
+                >
+                  Last updated:{" "}
                 </p>
-                <p className="mb-1"
-                style={{
-                  fontSize: "14px",
-                  color: "#666",
-                }}
-              >
-                {new Date(latestRate.CIMB.timestamp).toLocaleString()}
-              </p>
-            </div>
-          )}
-            </div>
+                <p
+                  className="mb-1"
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                  }}
+                >
+                  {new Date(latestRate.CIMB.timestamp).toLocaleString()}
+                </p>
+              </div>
+            )}
           </div>
         </div>
-        {/* Latest Rates Cards */}
-        <Row class="mb-1">
-          {latestRate?.CIMB && (
-            <Col xs={12} md={6} lg={3}>
-              <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-                <img
-                  class="mr-3"
-                  src={CIMBLogo}
-                  alt=""
-                  width="48"
-                  height="48"
-                  style={{ marginRight: "1rem" }}
-                />
-                <div class="lh-100">
-                  <h6 class="mb-0 text-black lh-100">
-                    1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
-                  </h6>
-                  <small>CIMB</small>
-                </div>
+      </div>
+      {/* Latest Rates Cards */}
+      <Row class="mb-1">
+        {latestRate?.CIMB && (
+          <Col xs={12} md={6} lg={3}>
+            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+              <img
+                class="mr-3"
+                src={CIMBLogo}
+                alt=""
+                width="48"
+                height="48"
+                style={{ marginRight: "1rem" }}
+              />
+              <div class="lh-100">
+                <h6 class="mb-0 text-black lh-100">
+                  1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
+                </h6>
+                <small>CIMB</small>
               </div>
-            </Col>
-          )}
-          {latestRate?.WISE && (
-            <Col xs={12} md={6} lg={3}>
-              <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
-                <img
-                  class="mr-3"
-                  src={WiseLogo}
-                  alt=""
-                  width="48"
-                  height="48"
-                  style={{ marginRight: "1rem" }}
-                />
-                <div class="lh-100">
-                  <h6 class="mb-0 text-black lh-100">
-                    1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
-                  </h6>
-                  <small>WISE</small>
-                </div>
+            </div>
+          </Col>
+        )}
+        {latestRate?.WISE && (
+          <Col xs={12} md={6} lg={3}>
+            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+              <img
+                class="mr-3"
+                src={WiseLogo}
+                alt=""
+                width="48"
+                height="48"
+                style={{ marginRight: "1rem" }}
+              />
+              <div class="lh-100">
+                <h6 class="mb-0 text-black lh-100">
+                  1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
+                </h6>
+                <small>WISE</small>
               </div>
-            </Col>
-          )}
-          {/* {latestRate?.PANDAREMIT && (
+            </div>
+          </Col>
+        )}
+        {/* {latestRate?.PANDAREMIT && (
               <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
                 <Card style={{ width: "100%" }}>
                   <Card.Body>
@@ -373,54 +401,54 @@ const CurrencyExchangeApp = () => {
                 </Card>
               </Col>
             )} */}
-          <Col xs={6} md={6} lg={2}>
-            <Form.Group controlId="sgdInput">
-              <Form.Label>SGD</Form.Label>
-              <Form.Control
-                type="number"
-                value={sgdValue}
-                onChange={handleSgdChange}
-                placeholder="Enter SGD amount"
-              />
-            </Form.Group>
-          </Col>
-          <Col xs={6} md={6} lg={2}>
-            <Form.Group controlId="myrInput">
-              <Form.Label>MYR</Form.Label>
-              <Form.Control
-                type="number"
-                value={myrValue}
-                onChange={handleMyrChange}
-                placeholder="Enter MYR amount"
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+        <Col xs={6} md={6} lg={2}>
+          <Form.Group controlId="sgdInput">
+            <Form.Label>SGD</Form.Label>
+            <Form.Control
+              type="number"
+              value={sgdValue}
+              onChange={handleSgdChange}
+              placeholder="Enter SGD amount"
+            />
+          </Form.Group>
+        </Col>
+        <Col xs={6} md={6} lg={2}>
+          <Form.Group controlId="myrInput">
+            <Form.Label>MYR</Form.Label>
+            <Form.Control
+              type="number"
+              value={myrValue}
+              onChange={handleMyrChange}
+              placeholder="Enter MYR amount"
+            />
+          </Form.Group>
+        </Col>
+      </Row>
 
       {/* Chart and Table Section */}
-        <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-          <h1 className="h3">Historical Rates</h1>
-          <div className="btn-toolbar mb-2 mb-md-0">
-            <div className="btn-group mr-1">
-              <Form.Select
-                className="form-select btn-outline-secondary"
-                id="timeframe-select"
-                value={timeFrame}
-                onChange={(e) => setTimeFrame(e.target.value)}
-              >
-                <option value="15min">6 Hours</option>
-                <option value="hour">1 Day</option>
-                <option value="day">1 Week</option>
-                {/* <option value="month">Last Month</option> */}
-                {/* <option value="year">Last Year</option> */}
-              </Form.Select>
-            </div>
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
+        <h1 className="h3">Historical Rates</h1>
+        <div className="btn-toolbar mb-2 mb-md-0">
+          <div className="btn-group mr-1">
+            <Form.Select
+              className="form-select btn-outline-secondary"
+              id="timeframe-select"
+              value={timeFrame}
+              onChange={(e) => setTimeFrame(e.target.value)}
+            >
+              <option value="15min">6 Hours</option>
+              <option value="hour">1 Day</option>
+              <option value="day">1 Week</option>
+              {/* <option value="month">Last Month</option> */}
+              {/* <option value="year">Last Year</option> */}
+            </Form.Select>
           </div>
         </div>
-        <Row>
-          <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px" }}>
-            <div>
-              {/* <h3
+      </div>
+      <Row>
+        <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px" }}>
+          <div>
+            {/* <h3
                 style={{
                   fontSize: "20px",
                   fontWeight: "semibold",
@@ -429,52 +457,52 @@ const CurrencyExchangeApp = () => {
               >
                 Exchange Rate Chart
               </h3> */}
-              <ResponsiveContainer width="100%" height={345}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="date"
-                    interval={5} // Show all ticks
-                    tickFormatter={(value, index) => {
-                      if (index === 0 || index === chartData.length - 1) {
-                        return "";
-                      }
-                      return ""; // Return an empty string for ticks that are not first or last
-                    }}
-                    angle={0}
-                    textAnchor="start"
-                  />
-                  <YAxis domain={yAxisDomain} />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="CIMBRate"
-                    name="CIMB"
-                    stroke="#982B1C"
-                    dot={false}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="WISERate"
-                    stroke="#1A4870"
-                    name="WISE"
-                    dot={false}
-                  />
-                  {/* <Line
+            <ResponsiveContainer width="100%" height={345}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  interval={5} // Show all ticks
+                  tickFormatter={(value, index) => {
+                    if (index === 0 || index === chartData.length - 1) {
+                      return "";
+                    }
+                    return ""; // Return an empty string for ticks that are not first or last
+                  }}
+                  angle={0}
+                  textAnchor="start"
+                />
+                <YAxis domain={yAxisDomain} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="CIMBRate"
+                  name="CIMB"
+                  stroke="#982B1C"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="WISERate"
+                  stroke="#1A4870"
+                  name="WISE"
+                  dot={false}
+                />
+                {/* <Line
                       type="monotone"
                       dataKey="PANDAREMITRate"
                       stroke="#FABC3F"
                       name="PANDAREMIT"
                       activeDot={{ r: 5 }}
                     /> */}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </Col>
-          <Col xs={12} md={6} lg={6} className="mb-1">
-            <div>
-              {/* <h3
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Col>
+        <Col xs={12} md={6} lg={6} className="mb-1">
+          <div>
+            {/* <h3
                 style={{
                   fontSize: "20px",
                   fontWeight: "semibold",
@@ -483,52 +511,52 @@ const CurrencyExchangeApp = () => {
               >
                 Exchange Rate Data
               </h3> */}
-              <div>
-                <Table hover>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>CIMB</th>
-                      <th>WISE</th>
+            <div>
+              <Table hover>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>CIMB</th>
+                    <th>WISE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentRecords.map((row, index) => (
+                    <tr key={index}>
+                      <td>{row.date}</td>
+                      <td>{row.CIMBRate}</td>
+                      <td>{row.WISERate}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {currentRecords.map((row, index) => (
-                      <tr key={index}>
-                        <td>{row.date}</td>
-                        <td>{row.CIMBRate}</td>
-                        <td>{row.WISERate}</td>
-                      </tr>
+                  ))}
+                </tbody>
+              </Table>
+              {totalPages > 1 && (
+                <div
+                  className="pagination"
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ButtonGroup className="me-2" aria-label="First group">
+                    {[...Array(totalPages)].map((_, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => handlePageChange(index + 1)}
+                        disabled={currentPage === index + 1}
+                        variant="secondary"
+                      >
+                        {index + 1}
+                      </Button>
                     ))}
-                  </tbody>
-                </Table>
-                {totalPages > 1 && (
-                  <div
-                    className="pagination"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <ButtonGroup className="me-2" aria-label="First group">
-                      {[...Array(totalPages)].map((_, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => handlePageChange(index + 1)}
-                          disabled={currentPage === index + 1}
-                          variant="secondary"
-                        >
-                          {index + 1}
-                        </Button>
-                      ))}
-                    </ButtonGroup>
-                  </div>
-                )}
-              </div>
+                  </ButtonGroup>
+                </div>
+              )}
             </div>
-          </Col>
-        </Row>
-      </Container>
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
