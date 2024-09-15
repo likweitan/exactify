@@ -118,7 +118,7 @@ const CurrencyExchangeApp = () => {
     const processData = () => {
       let groupedData = {};
       data.forEach((item) => {
-        const date = item.timestamp;
+        const date = new Date(item.timestamp); // Ensure we are using a proper Date object
         let key;
         switch (timeFrame) {
           case "hour":
@@ -130,10 +130,14 @@ const CurrencyExchangeApp = () => {
             ).getTime();
             break;
           case "day":
+            // Set the time to midnight (00:00:00) for accurate day comparison
             key = new Date(
               date.getFullYear(),
               date.getMonth(),
-              date.getDate()
+              date.getDate(),
+              0,
+              0,
+              0 // Explicitly set hours, minutes, seconds to 0
             ).getTime();
             break;
           case "month":
@@ -174,13 +178,7 @@ const CurrencyExchangeApp = () => {
         WISERate: groupedData[key]["WISE"]
           ? (
               groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count
-            ).toFixed(4)
-          : "-",
-        PANDAREMITRate: groupedData[key]["PANDAREMIT"]
-          ? (
-              groupedData[key]["PANDAREMIT"].sum /
-              groupedData[key]["PANDAREMIT"].count
-            ).toFixed(2)
+            ).toFixed(3)
           : "-",
       }));
 
