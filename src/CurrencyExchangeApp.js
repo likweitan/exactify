@@ -19,20 +19,6 @@ import Table from "react-bootstrap/Table";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
 
-const calculateMedian = (data) => {
-  const rates = data
-    .map((item) => item.CIMBRate)
-    .filter((rate) => rate !== "-");
-  const sortedRates = rates.sort((a, b) => a - b);
-  const middle = Math.floor(sortedRates.length / 2);
-
-  if (sortedRates.length % 2 === 0) {
-    return (sortedRates[middle - 1] + sortedRates[middle]) / 2;
-  } else {
-    return sortedRates[middle];
-  }
-};
-
 const calculateAverage = (data) => {
   const rates = data
     .map((item) => item.CIMBRate)
@@ -258,38 +244,6 @@ const CurrencyExchangeApp = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Handler for SGD to MYR conversion
-  const handleSgdToMyr = (e) => {
-    e.preventDefault();
-    if (!sgdAmount || isNaN(sgdAmount)) {
-      alert("Please enter a valid SGD amount.");
-      return;
-    }
-    const selectedRate = latestRate[selectedPlatformSgd]?.rate;
-    if (!selectedRate) {
-      alert("Selected platform rate is unavailable.");
-      return;
-    }
-    const result = parseFloat(sgdAmount) * selectedRate;
-    setSgdToMyrResult(result.toFixed(4));
-  };
-
-  // Handler for MYR to SGD conversion
-  const handleMyrToSgd = (e) => {
-    e.preventDefault();
-    if (!myrAmount || isNaN(myrAmount)) {
-      alert("Please enter a valid MYR amount.");
-      return;
-    }
-    const selectedRate = latestRate[selectedPlatformMyr]?.rate;
-    if (!selectedRate) {
-      alert("Selected platform rate is unavailable.");
-      return;
-    }
-    const result = parseFloat(myrAmount) / selectedRate;
-    setMyrToSgdResult(result.toFixed(4));
-  };
-
   const handleSgdChange = (e) => {
     const value = e.target.value;
     setSgdValue(value);
@@ -456,61 +410,13 @@ const CurrencyExchangeApp = () => {
         </div>
       </div>
       <Row>
-        <Col xs={12} md={6} lg={6} style={{ marginBottom: "20px" }}>
-          <div>
-            {/* <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "semibold",
-                  marginBottom: "10px",
-                }}
-              >
-                Exchange Rate Chart
-              </h3> */}
-            <ResponsiveContainer width="100%" height={345}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  interval={5} // Show all ticks
-                  tickFormatter={(value, index) => {
-                    if (index === 0 || index === chartData.length - 1) {
-                      return "";
-                    }
-                    return ""; // Return an empty string for ticks that are not first or last
-                  }}
-                  angle={0}
-                  textAnchor="start"
-                />
-                <YAxis domain={yAxisDomain} />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="CIMBRate"
-                  name="CIMB"
-                  stroke="#982B1C"
-                  dot={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="WISERate"
-                  stroke="#1A4870"
-                  name="WISE"
-                  dot={false}
-                />
-                {/* <Line
-                      type="monotone"
-                      dataKey="PANDAREMITRate"
-                      stroke="#FABC3F"
-                      name="PANDAREMIT"
-                      activeDot={{ r: 5 }}
-                    /> */}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Col>
-        <Col xs={12} md={6} lg={6} className="mb-1">
+        <Col
+          xs={12}
+          md={6}
+          lg={6}
+          className="mb-1"
+          style={{ marginTop: "0px", marginBottom: "10px" }}
+        >
           <div>
             {/* <h3
                 style={{
@@ -563,6 +469,58 @@ const CurrencyExchangeApp = () => {
                 </div>
               )}
             </div>
+          </div>
+        </Col>
+        <Col
+          xs={12}
+          md={6}
+          lg={6}
+          style={{ marginTop: "10px", marginBottom: "10px" }}
+        >
+          <div>
+            {/* <h3
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "semibold",
+                  marginBottom: "10px",
+                }}
+              >
+                Exchange Rate Chart
+              </h3> */}
+            <ResponsiveContainer width="100%" height={335}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  interval={5} // Show all ticks
+                  tickFormatter={(value, index) => {
+                    if (index === 0 || index === chartData.length - 1) {
+                      return "";
+                    }
+                    return ""; // Return an empty string for ticks that are not first or last
+                  }}
+                  angle={0}
+                  textAnchor="start"
+                />
+                <YAxis domain={yAxisDomain} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="bump"
+                  dataKey="CIMBRate"
+                  name="CIMB"
+                  stroke="#982B1C"
+                  dot={false}
+                />
+                <Line
+                  type="bump"
+                  dataKey="WISERate"
+                  stroke="#1A4870"
+                  name="WISE"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </Col>
       </Row>
