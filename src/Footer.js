@@ -1,4 +1,4 @@
-import { Button, Container, Col, Row, Form } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 const Footer = () => {
   return (
