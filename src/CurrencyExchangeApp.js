@@ -16,6 +16,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Table from "react-bootstrap/Table";
+import CIMBLogo from "./assets/cimb_logo.png";
+import WiseLogo from "./assets/wise_logo.png";
 
 const calculateMedian = (data) => {
   const rates = data
@@ -322,7 +324,7 @@ const CurrencyExchangeApp = () => {
               <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
                 <img
                   class="mr-3"
-                  src="https://companieslogo.com/img/orig/1023.KL.D-54a944fb.png?t=1720244490"
+                  src={CIMBLogo}
                   alt=""
                   width="48"
                   height="48"
@@ -342,7 +344,7 @@ const CurrencyExchangeApp = () => {
               <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
                 <img
                   class="mr-3"
-                  src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d7c0bb67-155c-4767-9bff-0848c5392cac"
+                  src={WiseLogo}
                   alt=""
                   width="48"
                   height="48"
