@@ -379,7 +379,7 @@ const LoanCalculator = () => {
   return (
     <Container className="mt-3">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-        <h1 className="h3">Home Loan</h1>
+        <h1 className="h3">Loan Calculator</h1>
         <div className="btn-toolbar mb-2 mb-md-0">
           <div className="btn-group mr-1 me-2">
             <Form.Select
@@ -631,9 +631,9 @@ const LoanCalculator = () => {
         )}
       </Row>
       {results && (
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-        <h1 className="h3">Payment Schedule</h1>
-      </div>
+        <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
+          <h1 className="h3">Payment Schedule</h1>
+        </div>
       )}
       <Row>
         {/* Add the pie chart here */}
@@ -641,16 +641,20 @@ const LoanCalculator = () => {
           <Col md={6}>
             <LoanPieChart
               principal={parseFloat(loanAmount)}
-              interest={parseFloat(results.totalInterest)} selectedCurrency={selectedCurrency}
+              interest={parseFloat(results.totalInterest)}
+              selectedCurrency={selectedCurrency}
             />
             {yearlyData.length > 0 && (
-          <Col md={12}>
-                <LoanLineChart data={yearlyData} selectedCurrency={selectedCurrency} />
+              <Col md={12}>
+                <LoanLineChart
+                  data={yearlyData}
+                  selectedCurrency={selectedCurrency}
+                />
+              </Col>
+            )}
           </Col>
         )}
-          </Col>
-        )}
-      {amortizationSchedule.length > 0 && (
+        {amortizationSchedule.length > 0 && (
           <Col md={6}>
             <Row>
               <Col>
@@ -681,7 +685,6 @@ const LoanCalculator = () => {
             </Row>
           </Col>
         )}
-        
       </Row>
       {/* <Row>
         <Col md={12}>

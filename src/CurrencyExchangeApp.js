@@ -169,7 +169,7 @@ const CurrencyExchangeApp = () => {
       }));
 
       // Slice the processed data to include only the last 48 records
-      const limitedProcessed = processed.slice(-48);
+      const limitedProcessed = processed.slice(-36);
 
       setChartData(limitedProcessed); // Keep the chart data in ascending order
       setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
@@ -290,7 +290,7 @@ const CurrencyExchangeApp = () => {
   return (
     <Container className="mt-3">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-        <h1 className="h3">Latest Rates</h1>
+        <h1 className="h3">Exchange Rates</h1>
         <div className="btn-toolbar mb-md-0">
           <div className="btn-group mr-1">
             {latestRate?.CIMB?.timestamp && (
@@ -400,9 +400,9 @@ const CurrencyExchangeApp = () => {
               value={timeFrame}
               onChange={(e) => setTimeFrame(e.target.value)}
             >
-              <option value="15min">6 Hours</option>
-              <option value="hour">1 Day</option>
-              <option value="day">1 Week</option>
+              <option value="15min">Every 5 Minutes</option>
+              <option value="hour">Hourly</option>
+              <option value="day">Daily</option>
               {/* <option value="month">Last Month</option> */}
               {/* <option value="year">Last Year</option> */}
             </Form.Select>
@@ -492,7 +492,7 @@ const CurrencyExchangeApp = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  interval={5} // Show all ticks
+                  interval={48} // Show all ticks
                   tickFormatter={(value, index) => {
                     if (index === 0 || index === chartData.length - 1) {
                       return "";
