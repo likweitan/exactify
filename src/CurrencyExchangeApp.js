@@ -489,20 +489,20 @@ const CurrencyExchangeApp = () => {
               </h3> */}
             <ResponsiveContainer width="100%" height={335}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  interval={48} // Show all ticks
-                  tickFormatter={(value, index) => {
-                    if (index === 0 || index === chartData.length - 1) {
-                      return "";
-                    }
-                    return ""; // Return an empty string for ticks that are not first or last
-                  }}
-                  angle={0}
-                  textAnchor="start"
-                />
-                <YAxis domain={yAxisDomain} />
+                // <CartesianGrid strokeDasharray="3 3" />
+                // <XAxis
+                //   dataKey="date"
+                //   interval={48} // Show all ticks
+                //   tickFormatter={(value, index) => {
+                //     if (index === 0 || index === chartData.length - 1) {
+                //       return "";
+                //     }
+                //     return ""; // Return an empty string for ticks that are not first or last
+                //   }}
+                //   angle={0}
+                //   textAnchor="start"
+                // />
+                // <YAxis domain={yAxisDomain} />
                 <Tooltip />
                 <Legend />
                 <Line
