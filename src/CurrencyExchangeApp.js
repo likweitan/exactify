@@ -489,7 +489,7 @@ const CurrencyExchangeApp = () => {
               </h3> */}
             <ResponsiveContainer width="100%" height={335}>
               <LineChart data={chartData}>
-                {/* <CartesianGrid strokeDasharray="3 3" />
+          {/* <CartesianGrid strokeDasharray="3 3" /> */}
                 <XAxis
                   dataKey="date"
                   interval={48} // Show all ticks
@@ -502,7 +502,7 @@ const CurrencyExchangeApp = () => {
                   angle={0}
                   textAnchor="start"
                 />
-                <YAxis domain={yAxisDomain} /> */}
+                <YAxis domain={yAxisDomain} />
                 <Tooltip />
                 <Legend />
                 <Line
