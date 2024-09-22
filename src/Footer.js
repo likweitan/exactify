@@ -12,8 +12,7 @@ const Footer = () => {
             <p>
               Exactify is not associated with{" "}
               <a href="https://www.cimb.com.sg">CIMB</a> or{" "}
-              <a href="https://www.wise.com">WISE</a>. All trademarks are the
-              property of their respective owners.
+              <a href="https://www.wise.com">WISE</a>.
             </p>
           </div>
         </Container>
