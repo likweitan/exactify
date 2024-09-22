@@ -10,7 +10,7 @@ const Footer = () => {
               Made by <a href="https://github.com/likweitan">@likweitan</a>.
             </p>
             <p>
-              This app is not affiliated with{" "}
+              Exactify is not associated with{" "}
               <a href="https://www.cimb.com.sg">CIMB</a> or{" "}
               <a href="https://www.wise.com">WISE</a>. All trademarks are the
               property of their respective owners.
