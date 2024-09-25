@@ -288,8 +288,8 @@ const CurrencyExchangeApp = () => {
   }
 
   return (
-    <Container className="mt-3">
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <Container className="mt-2">
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom">
         <h1 className="h3">Exchange Rates</h1>
         <div className="btn-toolbar mb-md-0">
           <div className="btn-group mr-1">
@@ -310,10 +310,10 @@ const CurrencyExchangeApp = () => {
         </div>
       </div>
       {/* Latest Rates Cards */}
-      <Row class="mb-1">
+      <Row class="mb-0">
         {latestRate?.CIMB && (
-          <Col xs={12} md={6} lg={4}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+          <Col xs={6} md={4} lg={2}>
+            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
               <img
                 class="mr-3"
                 src={CIMBLogo}
@@ -324,16 +324,16 @@ const CurrencyExchangeApp = () => {
               />
               <div class="lh-100">
                 <h6 class="mb-0 text-black lh-100">
-                  1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
+                  {latestRate.CIMB.rate.toFixed(4)} MYR
                 </h6>
-                <small>CIMB</small>
+                <small>1 SGD</small>
               </div>
             </div>
           </Col>
         )}
         {latestRate?.WISE && (
-          <Col xs={12} md={6} lg={4}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+          <Col xs={6} md={4} lg={2}>
+            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
               <img
                 class="mr-3"
                 src={WiseLogo}
@@ -344,9 +344,9 @@ const CurrencyExchangeApp = () => {
               />
               <div class="lh-100">
                 <h6 class="mb-0 text-black lh-100">
-                  1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
+                  {latestRate.WISE.rate.toFixed(4)} MYR
                 </h6>
-                <small>WISE</small>
+                <small>1 SGD</small>
               </div>
             </div>
           </Col>
