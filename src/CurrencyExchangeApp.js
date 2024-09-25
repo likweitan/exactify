@@ -50,7 +50,7 @@ const CurrencyExchangeApp = () => {
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 7; // Set to 8 records per page
+  const recordsPerPage = 5;
   const yAxisDomain = getYAxisDomain(chartData);
   const [sgdValue, setSgdValue] = useState("");
   const [myrValue, setMyrValue] = useState("");
@@ -290,7 +290,7 @@ const CurrencyExchangeApp = () => {
   return (
     <Container className="mt-2">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom">
-        <h1 className="h3">Exchange Rates</h1>
+        <h1 className="h4">Exchange Rates</h1>
         <div className="btn-toolbar mb-md-0">
           <div className="btn-group mr-1">
             {latestRate?.CIMB?.timestamp && (
@@ -312,15 +312,15 @@ const CurrencyExchangeApp = () => {
       {/* Latest Rates Cards */}
       <Row class="mb-0">
         {latestRate?.CIMB && (
-          <Col xs={6} md={4} lg={2}>
-            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
+          <Col xs={6} md={4} lg={3}>
+            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded border">
               <img
                 class="mr-3"
                 src={CIMBLogo}
                 alt=""
                 width="48"
                 height="48"
-                style={{ marginRight: "1rem" }}
+                style={{ marginRight: "10px" }}
               />
               <div class="lh-100">
                 <h6 class="mb-0 text-black lh-100">
@@ -332,7 +332,7 @@ const CurrencyExchangeApp = () => {
           </Col>
         )}
         {latestRate?.WISE && (
-          <Col xs={6} md={4} lg={2}>
+          <Col xs={6} md={4} lg={3}>
             <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
               <img
                 class="mr-3"
@@ -340,7 +340,7 @@ const CurrencyExchangeApp = () => {
                 alt=""
                 width="48"
                 height="48"
-                style={{ marginRight: "1rem" }}
+                style={{ marginRight: "10px" }}
               />
               <div class="lh-100">
                 <h6 class="mb-0 text-black lh-100">
@@ -351,7 +351,7 @@ const CurrencyExchangeApp = () => {
             </div>
           </Col>
         )}
-        <Col xs={6} md={6} lg={2}>
+        {/* <Col xs={6} md={4} lg={2}>
           <Form.Group controlId="sgdInput">
             <Form.Label>SGD</Form.Label>
             <Form.Control
@@ -362,7 +362,7 @@ const CurrencyExchangeApp = () => {
             />
           </Form.Group>
         </Col>
-        <Col xs={6} md={6} lg={2}>
+        <Col xs={6} md={4} lg={2}>
           <Form.Group controlId="myrInput">
             <Form.Label>MYR</Form.Label>
             <Form.Control
@@ -372,12 +372,12 @@ const CurrencyExchangeApp = () => {
               placeholder="Enter MYR amount"
             />
           </Form.Group>
-        </Col>
+        </Col> */}
       </Row>
 
       {/* Chart and Table Section */}
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-        <h1 className="h3">Historical Rates</h1>
+        <h1 className="h4">Historical Rates</h1>
         <div className="btn-toolbar mb-2 mb-md-0">
           <div className="btn-group mr-1">
             <Form.Select
@@ -395,7 +395,44 @@ const CurrencyExchangeApp = () => {
           </div>
         </div>
       </div>
-      <Row>
+      <Row class="mb-0">
+        <Col xs={12} md={6} lg={6}>
+          <div class="my-1">
+            <ResponsiveContainer width="100%" height={295}>
+              <LineChart data={chartData}>
+                <XAxis
+                  dataKey="date"
+                  interval={48} // Show all ticks
+                  tickFormatter={(value, index) => {
+                    if (index === 0 || index === chartData.length - 1) {
+                      return "";
+                    }
+                    return ""; // Return an empty string for ticks that are not first or last
+                  }}
+                  angle={0}
+                  textAnchor="start"
+                />
+                <YAxis domain={yAxisDomain} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="bump"
+                  dataKey="CIMBRate"
+                  name="CIMB"
+                  stroke="#982B1C"
+                  dot={false}
+                />
+                <Line
+                  type="bump"
+                  dataKey="WISERate"
+                  stroke="#1A4870"
+                  name="WISE"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Col>
         <Col
           xs={12}
           md={6}
@@ -446,48 +483,6 @@ const CurrencyExchangeApp = () => {
                 </div>
               )}
             </div>
-          </div>
-        </Col>
-        <Col
-          xs={12}
-          md={6}
-          lg={6}
-          style={{ marginTop: "10px", marginBottom: "10px" }}
-        >
-          <div>
-            <ResponsiveContainer width="100%" height={335}>
-              <LineChart data={chartData}>
-                <XAxis
-                  dataKey="date"
-                  interval={48} // Show all ticks
-                  tickFormatter={(value, index) => {
-                    if (index === 0 || index === chartData.length - 1) {
-                      return "";
-                    }
-                    return ""; // Return an empty string for ticks that are not first or last
-                  }}
-                  angle={0}
-                  textAnchor="start"
-                />
-                <YAxis domain={yAxisDomain} />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="bump"
-                  dataKey="CIMBRate"
-                  name="CIMB"
-                  stroke="#982B1C"
-                  dot={false}
-                />
-                <Line
-                  type="bump"
-                  dataKey="WISERate"
-                  stroke="#1A4870"
-                  name="WISE"
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
           </div>
         </Col>
       </Row>
