@@ -50,7 +50,7 @@ const CurrencyExchangeApp = () => {
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6; // Set to 8 records per page
+  const recordsPerPage = 5;
   const yAxisDomain = getYAxisDomain(chartData);
   const [sgdValue, setSgdValue] = useState("");
   const [myrValue, setMyrValue] = useState("");
@@ -169,7 +169,7 @@ const CurrencyExchangeApp = () => {
       }));
 
       // Slice the processed data to include only the last 48 records
-      const limitedProcessed = processed.slice(-36);
+      const limitedProcessed = processed.slice(-24);
 
       setChartData(limitedProcessed); // Keep the chart data in ascending order
       setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
@@ -288,9 +288,9 @@ const CurrencyExchangeApp = () => {
   }
 
   return (
-    <Container className="mt-3">
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-        <h1 className="h3">Exchange Rates</h1>
+    <Container className="mt-2">
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-2 mb-2 border-bottom">
+        <h5>Exchange Rates</h5>
         <div className="btn-toolbar mb-md-0">
           <div className="btn-group mr-1">
             {latestRate?.CIMB?.timestamp && (
@@ -310,17 +310,17 @@ const CurrencyExchangeApp = () => {
         </div>
       </div>
       {/* Latest Rates Cards */}
-      <Row class="mb-1">
+      <Row class="mb-0">
         {latestRate?.CIMB && (
-          <Col xs={12} md={6} lg={4}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+          <Col xs={12} md={6} lg={3}>
+            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded border">
               <img
                 class="mr-3"
                 src={CIMBLogo}
                 alt=""
                 width="48"
                 height="48"
-                style={{ marginRight: "1rem" }}
+                style={{ marginLeft: "10px", marginRight: "20px" }}
               />
               <div class="lh-100">
                 <h6 class="mb-0 text-black lh-100">
@@ -332,15 +332,15 @@ const CurrencyExchangeApp = () => {
           </Col>
         )}
         {latestRate?.WISE && (
-          <Col xs={12} md={6} lg={4}>
-            <div class="d-flex align-items-center p-3 my-2 text-black-50 rounded box-shadow border">
+          <Col xs={12} md={6} lg={3}>
+            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
               <img
                 class="mr-3"
                 src={WiseLogo}
                 alt=""
                 width="48"
                 height="48"
-                style={{ marginRight: "1rem" }}
+                style={{ marginLeft: "10px", marginRight: "20px" }}
               />
               <div class="lh-100">
                 <h6 class="mb-0 text-black lh-100">
@@ -351,21 +351,7 @@ const CurrencyExchangeApp = () => {
             </div>
           </Col>
         )}
-        {/* {latestRate?.PANDAREMIT && (
-              <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
-                <Card style={{ width: "100%" }}>
-                  <Card.Body>
-                    <Card.Title>
-                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR
-                    </Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                      PANDAREMIT
-                    </Card.Subtitle>
-                  </Card.Body>
-                </Card>
-              </Col>
-            )} */}
-        <Col xs={6} md={6} lg={2}>
+        {/* <Col xs={6} md={4} lg={2}>
           <Form.Group controlId="sgdInput">
             <Form.Label>SGD</Form.Label>
             <Form.Control
@@ -376,7 +362,7 @@ const CurrencyExchangeApp = () => {
             />
           </Form.Group>
         </Col>
-        <Col xs={6} md={6} lg={2}>
+        <Col xs={6} md={4} lg={2}>
           <Form.Group controlId="myrInput">
             <Form.Label>MYR</Form.Label>
             <Form.Control
@@ -386,16 +372,16 @@ const CurrencyExchangeApp = () => {
               placeholder="Enter MYR amount"
             />
           </Form.Group>
-        </Col>
+        </Col> */}
       </Row>
 
       {/* Chart and Table Section */}
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-3 mb-3 border-bottom">
-        <h1 className="h3">Historical Rates</h1>
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-2 mb-2 border-bottom">
+        <h5>Historical Rates</h5>
         <div className="btn-toolbar mb-2 mb-md-0">
           <div className="btn-group mr-1">
             <Form.Select
-              className="form-select btn-outline-secondary"
+              className="form-select form-select-sm mb-1"
               id="timeframe-select"
               value={timeFrame}
               onChange={(e) => setTimeFrame(e.target.value)}
@@ -409,7 +395,56 @@ const CurrencyExchangeApp = () => {
           </div>
         </div>
       </div>
-      <Row>
+      <Row class="mb-0">
+        <Col xs={12} md={6} lg={6}>
+          <div class="my-0">
+            <ResponsiveContainer width="100%" height={295}>
+              <LineChart
+                data={chartData}
+                margin={{
+                  top: 20,
+                  right: 0,
+                  left: 0,
+                  bottom: 20,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  interval={48} // Show all ticks
+                  tickFormatter={(value, index) => {
+                    if (index === 0 || index === chartData.length - 1) {
+                      return "";
+                    }
+                    return ""; // Return an empty string for ticks that are not first or last
+                  }}
+                  angle={0}
+                  textAnchor="start"
+                />
+                <YAxis domain={yAxisDomain} />
+                <Tooltip />
+                <Line
+                  type="natural"
+                  dataKey="CIMBRate"
+                  name="CIMB"
+                  stroke="#FA7070"
+                  dot={false}
+                  strokeWidth={2}
+                  animationEasing="linear"
+                />
+                <Line
+                  type="natural"
+                  dataKey="WISERate"
+                  stroke="#C6EBC5"
+                  name="WISE"
+                  dot={false}
+                  strokeWidth={2}
+                  animationEasing="linear"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Col>
         <Col
           xs={12}
           md={6}
@@ -418,17 +453,8 @@ const CurrencyExchangeApp = () => {
           style={{ marginTop: "0px", marginBottom: "10px" }}
         >
           <div>
-            {/* <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "semibold",
-                  marginBottom: "10px",
-                }}
-              >
-                Exchange Rate Data
-              </h3> */}
             <div>
-              <Table hover>
+              <Table responsive hover>
                 <thead>
                   <tr>
                     <th>Date</th>
@@ -454,7 +480,7 @@ const CurrencyExchangeApp = () => {
                     justifyContent: "center",
                   }}
                 >
-                  <ButtonGroup className="me-2" aria-label="First group">
+                  <ButtonGroup className="me-0" aria-label="First group">
                     {[...Array(totalPages)].map((_, index) => (
                       <Button
                         key={index}
@@ -469,58 +495,6 @@ const CurrencyExchangeApp = () => {
                 </div>
               )}
             </div>
-          </div>
-        </Col>
-        <Col
-          xs={12}
-          md={6}
-          lg={6}
-          style={{ marginTop: "10px", marginBottom: "10px" }}
-        >
-          <div>
-            {/* <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "semibold",
-                  marginBottom: "10px",
-                }}
-              >
-                Exchange Rate Chart
-              </h3> */}
-            <ResponsiveContainer width="100%" height={335}>
-              <LineChart data={chartData}>
-          {/* <CartesianGrid strokeDasharray="3 3" /> */}
-                <XAxis
-                  dataKey="date"
-                  interval={48} // Show all ticks
-                  tickFormatter={(value, index) => {
-                    if (index === 0 || index === chartData.length - 1) {
-                      return "";
-                    }
-                    return ""; // Return an empty string for ticks that are not first or last
-                  }}
-                  angle={0}
-                  textAnchor="start"
-                />
-                <YAxis domain={yAxisDomain} />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="bump"
-                  dataKey="CIMBRate"
-                  name="CIMB"
-                  stroke="#982B1C"
-                  dot={false}
-                />
-                <Line
-                  type="bump"
-                  dataKey="WISERate"
-                  stroke="#1A4870"
-                  name="WISE"
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
           </div>
         </Col>
       </Row>

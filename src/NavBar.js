@@ -27,11 +27,7 @@ import { Link } from "react-router-dom";
 
 const NavBar = () => {
   return (
-    <Navbar
-      style={{ backgroundSize: "0", backgroundColor: "#EEEEEE" }}
-      data-bs-theme="light"
-      expand="lg"
-    >
+    <Navbar expand="lg" bg="light" data-bs-theme="light">
       <Container>
         <Navbar.Brand as={Link} to="/">
           <img
@@ -41,7 +37,7 @@ const NavBar = () => {
             height="30"
             className="d-inline-block align-top"
           />{" "}
-          <text style={{ fontFamily: "cursive" }}>Exactify</text>
+          {/* <text>Exactify</text> */}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
