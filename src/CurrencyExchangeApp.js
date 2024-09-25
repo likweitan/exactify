@@ -312,7 +312,7 @@ const CurrencyExchangeApp = () => {
       {/* Latest Rates Cards */}
       <Row class="mb-0">
         {latestRate?.CIMB && (
-          <Col xs={12} md={6} lg={3}>
+          <Col xs={12} md={6} lg={4}>
             <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded border">
               <img
                 class="mr-3"
@@ -332,7 +332,7 @@ const CurrencyExchangeApp = () => {
           </Col>
         )}
         {latestRate?.WISE && (
-          <Col xs={12} md={6} lg={3}>
+          <Col xs={12} md={6} lg={4}>
             <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
               <img
                 class="mr-3"
