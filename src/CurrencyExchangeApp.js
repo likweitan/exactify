@@ -50,7 +50,7 @@ const CurrencyExchangeApp = () => {
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6; // Set to 8 records per page
+  const recordsPerPage = 7; // Set to 8 records per page
   const yAxisDomain = getYAxisDomain(chartData);
   const [sgdValue, setSgdValue] = useState("");
   const [myrValue, setMyrValue] = useState("");
@@ -351,20 +351,6 @@ const CurrencyExchangeApp = () => {
             </div>
           </Col>
         )}
-        {/* {latestRate?.PANDAREMIT && (
-              <Col xs={12} md={6} lg={4} style={{ marginBottom: "10px" }}>
-                <Card style={{ width: "100%" }}>
-                  <Card.Body>
-                    <Card.Title>
-                      1 SGD = {latestRate.PANDAREMIT.rate.toFixed(4)} MYR
-                    </Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                      PANDAREMIT
-                    </Card.Subtitle>
-                  </Card.Body>
-                </Card>
-              </Col>
-            )} */}
         <Col xs={6} md={6} lg={2}>
           <Form.Group controlId="sgdInput">
             <Form.Label>SGD</Form.Label>
@@ -418,15 +404,6 @@ const CurrencyExchangeApp = () => {
           style={{ marginTop: "0px", marginBottom: "10px" }}
         >
           <div>
-            {/* <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "semibold",
-                  marginBottom: "10px",
-                }}
-              >
-                Exchange Rate Data
-              </h3> */}
             <div>
               <Table hover>
                 <thead>
@@ -478,18 +455,8 @@ const CurrencyExchangeApp = () => {
           style={{ marginTop: "10px", marginBottom: "10px" }}
         >
           <div>
-            {/* <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "semibold",
-                  marginBottom: "10px",
-                }}
-              >
-                Exchange Rate Chart
-              </h3> */}
             <ResponsiveContainer width="100%" height={335}>
               <LineChart data={chartData}>
-          {/* <CartesianGrid strokeDasharray="3 3" /> */}
                 <XAxis
                   dataKey="date"
                   interval={48} // Show all ticks
