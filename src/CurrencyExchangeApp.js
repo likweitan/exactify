@@ -19,6 +19,74 @@ import Table from "react-bootstrap/Table";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
 
+// Linear Regression function with adjusted prediction ranges
+const linearRegression = (data, timeFrame) => {
+  if (!data || data.length === 0) {
+    console.warn("No data available for linear regression");
+    return [];
+  }
+
+  const validData = data.filter(
+    (point) => point && typeof point.rate === "number" && point.timestamp
+  );
+
+  if (validData.length < 2) {
+    console.warn("Insufficient valid data points for linear regression");
+    return [];
+  }
+
+  const xSum = validData.reduce((sum, _, i) => sum + i, 0);
+  const ySum = validData.reduce((sum, point) => sum + point.rate, 0);
+  const xySum = validData.reduce((sum, point, i) => sum + i * point.rate, 0);
+  const x2Sum = validData.reduce((sum, _, i) => sum + i * i, 0);
+  const n = validData.length;
+
+  const slope = (n * xySum - xSum * ySum) / (n * x2Sum - xSum * xSum);
+  const intercept = (ySum - slope * xSum) / n;
+
+  const predictedData = [];
+  const lastDate = new Date(validData[validData.length - 1].timestamp);
+
+  let predictionCount;
+  switch (timeFrame) {
+    case "15min":
+      predictionCount = 12; // 60 minutes / 5 minutes = 12 predictions
+      break;
+    case "hour":
+      predictionCount = 24; // 24 hours
+      break;
+    case "day":
+      predictionCount = 7; // 7 days
+      break;
+    default:
+      predictionCount = 12; // Default to 60 minutes for unknown timeframes
+  }
+
+  for (let i = 1; i <= predictionCount; i++) {
+    let predictedDate = new Date(lastDate);
+    switch (timeFrame) {
+      case "15min":
+        predictedDate.setMinutes(lastDate.getMinutes() + i * 5);
+        break;
+      case "hour":
+        predictedDate.setHours(lastDate.getHours() + i);
+        break;
+      case "day":
+        predictedDate.setDate(lastDate.getDate() + i);
+        break;
+      default:
+        predictedDate.setMinutes(lastDate.getMinutes() + i * 5);
+    }
+
+    predictedData.push({
+      timestamp: predictedDate,
+      rate: slope * (n + i - 1) + intercept,
+    });
+  }
+
+  return predictedData;
+};
+
 const calculateAverage = (data) => {
   const rates = data
     .map((item) => item.CIMBRate)
@@ -45,7 +113,7 @@ const getYAxisDomain = (data) => {
 
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
-  const [timeFrame, setTimeFrame] = useState("hour");
+  const [timeFrame, setTimeFrame] = useState("day");
   const [chartData, setChartData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
@@ -54,6 +122,8 @@ const CurrencyExchangeApp = () => {
   const yAxisDomain = getYAxisDomain(chartData);
   const [sgdValue, setSgdValue] = useState("");
   const [myrValue, setMyrValue] = useState("");
+  const [predictedCIMB, setPredictedCIMB] = useState([]);
+  const [predictedWISE, setPredictedWISE] = useState([]);
 
   // State variables for SGD to MYR conversion
   const [sgdAmount, setSgdAmount] = useState("");
@@ -102,11 +172,49 @@ const CurrencyExchangeApp = () => {
 
   useEffect(() => {
     const processData = () => {
+      const now = new Date();
+      let filteredData = [];
+
+      switch (timeFrame) {
+        case "15min":
+          // Filter last 4 hours of data
+          filteredData = data.filter((item) => {
+            const itemDate = new Date(item.timestamp);
+            return now - itemDate <= 4 * 60 * 60 * 1000;
+          });
+          break;
+        case "hour":
+          // Filter last 48 hours of data
+          filteredData = data.filter((item) => {
+            const itemDate = new Date(item.timestamp);
+            return now - itemDate <= 48 * 60 * 60 * 1000;
+          });
+          break;
+        case "day":
+          // Filter last 1 week of data
+          filteredData = data.filter((item) => {
+            const itemDate = new Date(item.timestamp);
+            return now - itemDate <= 7 * 24 * 60 * 60 * 1000;
+          });
+          break;
+        default:
+          filteredData = data;
+      }
+
       let groupedData = {};
-      data.forEach((item) => {
-        const date = new Date(item.timestamp); // Ensure we are using a proper Date object
+      filteredData.forEach((item) => {
+        const date = new Date(item.timestamp);
         let key;
         switch (timeFrame) {
+          case "15min":
+            key = new Date(
+              date.getFullYear(),
+              date.getMonth(),
+              date.getDate(),
+              date.getHours(),
+              Math.floor(date.getMinutes() / 5) * 5
+            ).getTime();
+            break;
           case "hour":
             key = new Date(
               date.getFullYear(),
@@ -116,40 +224,24 @@ const CurrencyExchangeApp = () => {
             ).getTime();
             break;
           case "day":
-            // Set the time to midnight (00:00:00) for accurate day comparison
             key = new Date(
               date.getFullYear(),
               date.getMonth(),
-              date.getDate(),
-              0,
-              0,
-              0 // Explicitly set hours, minutes, seconds to 0
+              date.getDate()
             ).getTime();
-            break;
-          case "month":
-            key = new Date(date.getFullYear(), date.getMonth()).getTime();
-            break;
-          case "year":
-            key = new Date(date.getFullYear(), 0).getTime();
             break;
           default:
             key = date.getTime();
         }
 
-        // Initialize the structure for this key if it doesn't exist
         if (!groupedData[key]) {
           groupedData[key] = {};
         }
 
-        // If groupedData[key][item.platform] is not an object, initialize it as an object
-        if (
-          !groupedData[key][item.platform] ||
-          typeof groupedData[key][item.platform] !== "object"
-        ) {
+        if (!groupedData[key][item.platform]) {
           groupedData[key][item.platform] = { sum: 0, count: 0 };
         }
 
-        // Aggregate the rate (sum and count)
         groupedData[key][item.platform].sum += item.rate;
         groupedData[key][item.platform].count += 1;
       });
@@ -160,19 +252,49 @@ const CurrencyExchangeApp = () => {
           ? (
               groupedData[key]["CIMB"].sum / groupedData[key]["CIMB"].count
             ).toFixed(4)
-          : "-",
+          : null,
         WISERate: groupedData[key]["WISE"]
           ? (
               groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count
-            ).toFixed(3)
-          : "-",
+            ).toFixed(4)
+          : null,
       }));
 
-      // Slice the processed data to include only the last 48 records
-      const limitedProcessed = processed.slice(-24);
+      // Add predictive analytics
+      const cimbData = filteredData.filter((item) => item.platform === "CIMB");
+      const wiseData = filteredData.filter((item) => item.platform === "WISE");
 
-      setChartData(limitedProcessed); // Keep the chart data in ascending order
-      setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
+      const predictedCIMBData = linearRegression(cimbData, timeFrame);
+      const predictedWISEData = linearRegression(wiseData, timeFrame);
+
+      setPredictedCIMB(predictedCIMBData);
+      setPredictedWISE(predictedWISEData);
+
+      // Combine actual and predicted data for the chart
+      let combinedData = [...processed];
+
+      if (processed.length > 0) {
+        const lastActualDataPoint = processed[processed.length - 1];
+        combinedData.push({
+          date: lastActualDataPoint.date,
+          CIMBRate: lastActualDataPoint.CIMBRate,
+          WISERate: lastActualDataPoint.WISERate,
+          PredictedCIMBRate: lastActualDataPoint.CIMBRate,
+          PredictedWISERate: lastActualDataPoint.WISERate,
+        });
+      }
+
+      combinedData = [
+        ...combinedData,
+        ...predictedCIMBData.map((item, index) => ({
+          date: formatDate(item.timestamp),
+          PredictedCIMBRate: item.rate.toFixed(4),
+          PredictedWISERate: predictedWISEData[index].rate.toFixed(4),
+        })),
+      ];
+
+      setChartData(combinedData);
+      setTableData([...processed].reverse());
     };
 
     processData();
@@ -395,9 +517,9 @@ const CurrencyExchangeApp = () => {
           </div>
         </div>
       </div>
-      <Row class="mb-0">
+      <Row className="mb-0">
         <Col xs={12} md={6} lg={6}>
-          <div class="my-0">
+          <div className="my-0">
             <ResponsiveContainer width="100%" height={295}>
               <LineChart
                 data={chartData}
@@ -409,37 +531,38 @@ const CurrencyExchangeApp = () => {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  interval={48} // Show all ticks
-                  tickFormatter={(value, index) => {
-                    if (index === 0 || index === chartData.length - 1) {
-                      return "";
-                    }
-                    return ""; // Return an empty string for ticks that are not first or last
-                  }}
-                  angle={0}
-                  textAnchor="start"
-                />
-                <YAxis domain={yAxisDomain} />
+                <XAxis dataKey="date" interval={48} />
+                <YAxis domain={getYAxisDomain(chartData)} />
                 <Tooltip />
                 <Line
-                  type="natural"
                   dataKey="CIMBRate"
                   name="CIMB"
                   stroke="#FA7070"
                   dot={false}
                   strokeWidth={2}
-                  animationEasing="linear"
                 />
                 <Line
-                  type="natural"
                   dataKey="WISERate"
-                  stroke="#C6EBC5"
                   name="WISE"
+                  stroke="#C6EBC5"
                   dot={false}
                   strokeWidth={2}
-                  animationEasing="linear"
+                />
+                <Line
+                  dataKey="PredictedCIMBRate"
+                  name="CIMB"
+                  stroke="#FA7070"
+                  strokeDasharray="5 5"
+                  dot={false}
+                  strokeWidth={2}
+                />
+                <Line
+                  dataKey="PredictedWISERate"
+                  name="WISE"
+                  stroke="#C6EBC5"
+                  strokeDasharray="5 5"
+                  dot={false}
+                  strokeWidth={2}
                 />
               </LineChart>
             </ResponsiveContainer>
