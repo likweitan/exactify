@@ -90,7 +90,7 @@ const getYAxisDomain = (data) => {
 
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
-  const [timeFrame, setTimeFrame] = useState("hour");
+  const [timeFrame, setTimeFrame] = useState("day");
   const [chartData, setChartData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
@@ -526,7 +526,7 @@ const CurrencyExchangeApp = () => {
           </Heading>
           <Select
             w="auto"
-            size="md"
+            size="sm"
             value={timeFrame}
             onChange={(e) => setTimeFrame(e.target.value)}
             variant="filled"
@@ -617,7 +617,9 @@ const CurrencyExchangeApp = () => {
                       key={index}
                       onClick={() => handlePageChange(index + 1)}
                       isDisabled={currentPage === index + 1}
-                      variant="outline"
+                      colorScheme="teal"
+                      variant="ghost"
+                      size="sm"
                     >
                       {index + 1}
                     </Button>
