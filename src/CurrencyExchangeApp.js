@@ -46,6 +46,7 @@ import {
   keyframes,
   usePrefersReducedMotion,
   Badge,
+  Spinner,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
@@ -434,7 +435,7 @@ const CurrencyExchangeApp = () => {
       {/* Latest Rates Cards */}
       <StatGroup>
         <Wrap spacingX="60px" spacingY="10px">
-          {latestRate?.CIMB && (
+          {latestRate?.CIMB ? (
             <WrapItem>
               <Stat>
                 <StatLabel color="#ED1C24">CIMB</StatLabel>
@@ -442,6 +443,8 @@ const CurrencyExchangeApp = () => {
                 {renderStatHelpText("CIMB")}
               </Stat>
             </WrapItem>
+          ) : (
+            <Spinner />
           )}
 
           {latestRate?.WISE && (
@@ -455,14 +458,14 @@ const CurrencyExchangeApp = () => {
           )}
         </Wrap>
       </StatGroup>
-      <Box position="relative" padding="5">
-        <Divider />
-        {latestRate?.CIMB?.timestamp && (
+      {latestRate?.CIMB?.timestamp && (
+        <Box position="relative" padding="5">
+          <Divider />
           <AbsoluteCenter bg="white" px="4">
             {timeAgo(latestRate.CIMB.timestamp)}
           </AbsoluteCenter>
-        )}
-      </Box>
+        </Box>
+      )}
       {/* Currency Conversion Calculator */}
       {/* <Box mt={0}>
         <Flex justifyContent="space-between" alignItems="center">
