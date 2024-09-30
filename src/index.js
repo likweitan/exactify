@@ -1,31 +1,35 @@
-import reportWebVitals from './reportWebVitals';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css';  // Import Bootstrap CSS
-import CurrencyExchangeApp from './CurrencyExchangeApp';
-import NavBar from './NavBar';
-import Footer from './Footer';
-import Home from './Home';  // Import the Home component
-import LoanCalculator from './LoanCalculator';
-import CarInsuranceCalculator from './CarInsuranceCalculator';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Analytics } from "@vercel/analytics/react"
+import reportWebVitals from "./reportWebVitals";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// 1. import `ChakraProvider` component
+import { ChakraProvider } from "@chakra-ui/react";
+import CurrencyExchangeApp from "./CurrencyExchangeApp";
+import NavBar from "./NavBar";
+import Footer from "./Footer";
+import Home from "./Home"; // Import the Home component
+import LoanCalculator from "./LoanCalculator";
+import CarInsuranceCalculator from "./CarInsuranceCalculator";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Router>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/exchange" element={<CurrencyExchangeApp />} />
-        <Route path="/loancalculator" element={<LoanCalculator />} />
-        <Route path="/carinsurance" element={<CarInsuranceCalculator />} />
-      </Routes>
-      <Footer/>
-      <Analytics />
-    </Router>
+    <ChakraProvider>
+      <Router>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<CurrencyExchangeApp />} />
+          <Route path="/exchange" element={<CurrencyExchangeApp />} />
+          <Route path="/loancalculator" element={<LoanCalculator />} />
+          <Route path="/carinsurance" element={<CarInsuranceCalculator />} />
+        </Routes>
+        <Footer />
+        <Analytics />
+      </Router>
+    </ChakraProvider>
   </React.StrictMode>
 );
 

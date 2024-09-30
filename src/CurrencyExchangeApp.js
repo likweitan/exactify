@@ -11,16 +11,46 @@ import {
 } from "recharts";
 import {
   Container,
-  Row,
-  Col,
-  Form,
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Select,
+  Image,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
   Button,
   ButtonGroup,
-  Table,
+  Input,
+  FormControl,
+  FormLabel,
   Card,
-} from "react-bootstrap";
+  CardBody,
+  Stack,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  StatGroup,
+  Divider,
+  AbsoluteCenter,
+  Grid,
+  GridItem,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
+
+const calculatePercentageChange = (currentRate, previousRate) => {
+  if (previousRate === 0) return 0;
+  return ((currentRate - previousRate) / previousRate) * 100;
+};
 
 const calculateAverage = (data) => {
   const rates = data
@@ -62,6 +92,7 @@ const CurrencyExchangeApp = () => {
   const [sgdAmount, setSgdAmount] = useState("");
   const [myrAmount, setMyrAmount] = useState("");
   const [conversionPlatform, setConversionPlatform] = useState("CIMB");
+  const [previousRates, setPreviousRates] = useState(null);
 
   useEffect(() => {
     fetch(
@@ -94,6 +125,27 @@ const CurrencyExchangeApp = () => {
           CIMB: latestCIMB,
           WISE: latestWISE,
           PANDAREMIT: latestPANDAREMIT,
+        });
+        // Get the rates from 24 hours ago
+        const previousCIMB = formattedData
+          .filter(
+            (item) =>
+              item.platform === "CIMB" &&
+              item.timestamp.getTime() <= Date.now() - 24 * 60 * 60 * 1000
+          )
+          .at(-1);
+
+        const previousWISE = formattedData
+          .filter(
+            (item) =>
+              item.platform === "WISE" &&
+              item.timestamp.getTime() <= Date.now() - 24 * 60 * 60 * 1000
+          )
+          .at(-1);
+
+        setPreviousRates({
+          CIMB: previousCIMB,
+          WISE: previousWISE,
         });
       });
   }, []);
@@ -284,178 +336,158 @@ const CurrencyExchangeApp = () => {
   };
 
   return (
-    <Container className="mt-2">
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-2 mb-2 border-bottom">
-        <h1>Exchange Rates</h1>
-        <div className="btn-toolbar mb-md-0">
-          <div className="btn-group mr-1">
-            {latestRate?.CIMB?.timestamp && (
-              <div>
-                <p
-                  className="mb-1"
-                  style={{
-                    fontSize: "14px",
-                    color: "#666",
-                  }}
-                >
-                  Updated {timeAgo(latestRate.CIMB.timestamp)}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+    <Container maxW="container.xl" mt={4}>
+      <Flex justifyContent="space-between" alignItems="center">
+        <Heading as="h1" size="lg">
+          EXACTIFY
+        </Heading>
+      </Flex>
+      <Box position="relative" paddingY="5">
+        <Divider />
+      </Box>
+
       {/* Latest Rates Cards */}
-      <Row class="mb-0">
-        {latestRate?.CIMB && (
-          <Col xs={12} md={6} lg={4}>
-            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded border">
-              <img
-                class="mr-3"
-                src={CIMBLogo}
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginLeft: "10px", marginRight: "20px" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  1 SGD = {latestRate.CIMB.rate.toFixed(4)} MYR
-                </h6>
-                <small>CIMB</small>
-              </div>
-            </div>
-          </Col>
+      <StatGroup>
+        <Wrap spacing="70px">
+          {latestRate?.CIMB && previousRates?.CIMB && (
+            <WrapItem>
+              <Stat>
+                <StatLabel>CIMB</StatLabel>
+                <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
+                <StatHelpText>
+                  <StatArrow
+                    type={
+                      latestRate.CIMB.rate > previousRates.CIMB.rate
+                        ? "increase"
+                        : "decrease"
+                    }
+                  />
+                  {calculatePercentageChange(
+                    latestRate.CIMB.rate,
+                    previousRates.CIMB.rate
+                  ).toFixed(2)}
+                  %
+                </StatHelpText>
+              </Stat>
+            </WrapItem>
+          )}
+
+          {latestRate?.WISE && previousRates?.WISE && (
+            <WrapItem>
+              <Stat>
+                <StatLabel>WISE</StatLabel>
+                <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
+                <StatHelpText>
+                  <StatArrow
+                    type={
+                      latestRate.WISE.rate > previousRates.WISE.rate
+                        ? "increase"
+                        : "decrease"
+                    }
+                  />
+                  {calculatePercentageChange(
+                    latestRate.WISE.rate,
+                    previousRates.WISE.rate
+                  ).toFixed(2)}
+                  %
+                </StatHelpText>
+              </Stat>
+            </WrapItem>
+          )}
+        </Wrap>
+      </StatGroup>
+      <Box position="relative" padding="5">
+        <Divider />
+        {latestRate?.CIMB?.timestamp && (
+          <AbsoluteCenter bg="white" px="4">
+            {timeAgo(latestRate.CIMB.timestamp)}
+          </AbsoluteCenter>
         )}
-        {latestRate?.WISE && (
-          <Col xs={12} md={6} lg={4}>
-            <div class="d-flex align-items-center p-2 my-1 text-black-50 rounded box-shadow border">
-              <img
-                class="mr-3"
-                src={WiseLogo}
-                alt=""
-                width="48"
-                height="48"
-                style={{ marginLeft: "10px", marginRight: "20px" }}
-              />
-              <div class="lh-100">
-                <h6 class="mb-0 text-black lh-100">
-                  1 SGD = {latestRate.WISE.rate.toFixed(4)} MYR
-                </h6>
-                <small>WISE</small>
-              </div>
-            </div>
-          </Col>
-        )}
-        {/* <Col xs={6} md={4} lg={2}>
-          <Form.Group controlId="sgdInput">
-            <Form.Label>SGD</Form.Label>
-            <Form.Control
-              type="number"
-              value={sgdValue}
-              onChange={handleSgdChange}
-              placeholder="Enter SGD amount"
-            />
-          </Form.Group>
-        </Col>
-        <Col xs={6} md={4} lg={2}>
-          <Form.Group controlId="myrInput">
-            <Form.Label>MYR</Form.Label>
-            <Form.Control
-              type="number"
-              value={myrValue}
-              onChange={handleMyrChange}
-              placeholder="Enter MYR amount"
-            />
-          </Form.Group>
-        </Col> */}
-      </Row>
+      </Box>
       {/* Currency Conversion Calculator */}
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-4 mb-2 border-bottom">
-        <h5>Currency Conversion Calculator</h5>
-      </div>
-      <Row>
-        <Col xs={12} md={6}>
-          <Card>
-            <Card.Body>
-              <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>SGD Amount</Form.Label>
-                  <Form.Control
+      {/* <Box mt={0}>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Heading as="h1" size="md">
+            Conversion
+          </Heading>
+          <Select
+            w="auto"
+            size="md"
+            value={conversionPlatform}
+            onChange={(e) => {
+              setConversionPlatform(e.target.value);
+              if (sgdAmount) handleSgdChange(sgdAmount);
+              else if (myrAmount) handleMyrChange(myrAmount);
+            }}
+            variant="filled"
+          >
+            <option value="CIMB">CIMB</option>
+            <option value="WISE">WISE</option>
+          </Select>
+        </Flex>
+        <Flex flexWrap="wrap">
+          <Box w={["100%", "100%"]} mt={4} mb={4}>
+            <Wrap>
+              <WrapItem>
+                <FormControl>
+                  <FormLabel>SGD</FormLabel>
+                  <Input
                     type="number"
                     value={sgdAmount}
                     onChange={(e) => handleSgdChange(e.target.value)}
                     placeholder="Enter SGD amount"
                   />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>MYR Amount</Form.Label>
-                  <Form.Control
+                </FormControl>
+              </WrapItem>
+              <WrapItem>
+                <Text>X</Text>
+              </WrapItem>
+              <WrapItem>
+                <FormControl>
+                  <FormLabel>MYR</FormLabel>
+                  <Input
                     type="number"
                     value={myrAmount}
                     onChange={(e) => handleMyrChange(e.target.value)}
                     placeholder="Enter MYR amount"
                   />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Platform</Form.Label>
-                  <Form.Select
-                    value={conversionPlatform}
-                    onChange={(e) => {
-                      setConversionPlatform(e.target.value);
-                      // Recalculate based on the new platform
-                      if (sgdAmount) handleSgdChange(sgdAmount);
-                      else if (myrAmount) handleMyrChange(myrAmount);
-                    }}
-                  >
-                    <option value="CIMB">CIMB</option>
-                    <option value="WISE">WISE</option>
-                  </Form.Select>
-                </Form.Group>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col xs={12} md={6}>
-          <Card>
-            <Card.Body>
-              <h6>Current Exchange Rate</h6>
-              {latestRate && latestRate[conversionPlatform] ? (
-                <p className="h4">
-                  1 SGD = {latestRate[conversionPlatform].rate.toFixed(4)} MYR
-                </p>
-              ) : (
-                <p>Loading latest exchange rate...</p>
-              )}
-              <p className="text-muted">Platform: {conversionPlatform}</p>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-      {/* Chart and Table Section */}
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-2 mb-2 border-bottom">
-        <h5>Historical Rates</h5>
-        <div className="btn-toolbar mb-2 mb-md-0">
-          <div className="btn-group mr-1">
-            <Form.Select
-              className="form-select form-select-sm mb-1"
-              id="timeframe-select"
-              value={timeFrame}
-              onChange={(e) => setTimeFrame(e.target.value)}
-            >
-              <option value="15min">Every 5 Minutes</option>
-              <option value="hour">Hourly</option>
-              <option value="day">Daily</option>
-              {/* <option value="month">Last Month</option> */}
-              {/* <option value="year">Last Year</option> */}
-            </Form.Select>
-          </div>
-        </div>
-      </div>
-      <Row class="mb-0">
-        <Col xs={12} md={6} lg={6}>
-          <div class="my-0">
-            <ResponsiveContainer width="100%" height={295}>
+                </FormControl>
+              </WrapItem>
+            </Wrap>
+          </Box>
+        </Flex>
+      </Box> 
+      <Box position="relative" padding="5">
+        <Divider />
+      </Box>
+*/}
+      {/* Historical Rates */}
+      <Box mt={4}>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Heading as="h1" size="md">
+            Historical Rates
+          </Heading>
+          <Select
+            w="auto"
+            size="md"
+            value={timeFrame}
+            onChange={(e) => setTimeFrame(e.target.value)}
+            variant="filled"
+          >
+            <option value="15min">Every 5 Minutes</option>
+            <option value="hour">Hourly</option>
+            <option value="day">Daily</option>
+          </Select>
+        </Flex>
+        {/* <Box position="relative" padding="10">
+          <Divider />
+          <AbsoluteCenter bg="white" px="4">
+            Content
+          </AbsoluteCenter>
+        </Box> */}
+        <Flex flexWrap="wrap" mt={4}>
+          <Box w={["100%", "50%"]} pr={[0, 4]} mb={4}>
+            <ResponsiveContainer width="100%" height={355}>
               <LineChart
                 data={chartData}
                 margin={{
@@ -468,12 +500,12 @@ const CurrencyExchangeApp = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  interval={48} // Show all ticks
+                  interval={48}
                   tickFormatter={(value, index) => {
                     if (index === 0 || index === chartData.length - 1) {
                       return "";
                     }
-                    return ""; // Return an empty string for ticks that are not first or last
+                    return "";
                   }}
                   angle={0}
                   textAnchor="start"
@@ -500,61 +532,45 @@ const CurrencyExchangeApp = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-        </Col>
-        <Col
-          xs={12}
-          md={6}
-          lg={6}
-          className="mb-1"
-          style={{ marginTop: "0px", marginBottom: "10px" }}
-        >
-          <div>
-            <div>
-              <Table responsive hover>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>CIMB</th>
-                    <th>WISE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentRecords.map((row, index) => (
-                    <tr key={index}>
-                      <td>{row.date}</td>
-                      <td>{row.CIMBRate}</td>
-                      <td>{row.WISERate}</td>
-                    </tr>
+          </Box>
+          <Box w={["100%", "50%"]} pl={[0, 4]} mb={4}>
+            <Table variant="simple" size="md">
+              <Thead>
+                <Tr>
+                  <Th>Date</Th>
+                  <Th>CIMB</Th>
+                  <Th>WISE</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {currentRecords.map((row, index) => (
+                  <Tr key={index}>
+                    <Td>{row.date}</Td>
+                    <Td>{row.CIMBRate}</Td>
+                    <Td>{row.WISERate}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+            {totalPages > 1 && (
+              <Flex justifyContent="center" mt={4}>
+                <ButtonGroup>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => handlePageChange(index + 1)}
+                      isDisabled={currentPage === index + 1}
+                      variant="outline"
+                    >
+                      {index + 1}
+                    </Button>
                   ))}
-                </tbody>
-              </Table>
-              {totalPages > 1 && (
-                <div
-                  className="pagination"
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ButtonGroup className="me-0" aria-label="First group">
-                    {[...Array(totalPages)].map((_, index) => (
-                      <Button
-                        key={index}
-                        onClick={() => handlePageChange(index + 1)}
-                        disabled={currentPage === index + 1}
-                        variant="secondary"
-                      >
-                        {index + 1}
-                      </Button>
-                    ))}
-                  </ButtonGroup>
-                </div>
-              )}
-            </div>
-          </div>
-        </Col>
-      </Row>
+                </ButtonGroup>
+              </Flex>
+            )}
+          </Box>
+        </Flex>
+      </Box>
     </Container>
   );
 };

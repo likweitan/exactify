@@ -27,33 +27,34 @@ import { Link } from "react-router-dom";
 
 const NavBar = () => {
   return (
-    <Navbar expand="lg" bg="light" data-bs-theme="light">
-      <Container>
-        <Navbar.Brand as={Link} to="/">
-          <img
-            alt=""
-            src="/logo.png"
-            width="30"
-            height="30"
-            className="d-inline-block align-top"
-          />{" "}
-          {/* <text>Exactify</text> */}
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            {/* <Nav.Link as={Link} to="/">Home</Nav.Link> */}
-            <Nav.Link as={Link} to="/exchange">
-              Exchange Rates
-            </Nav.Link>
-            <Nav.Link as={Link} to="/loancalculator">
-              Loan Calculator
-            </Nav.Link>
-            {/* <Nav.Link as={Link} to="/carinsurance">Car Insurance</Nav.Link> */}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+    <></>
+    // <Navbar expand="lg" bg="light" data-bs-theme="light">
+    //   <Container>
+    //     <Navbar.Brand as={Link} to="/">
+    //       <img
+    //         alt=""
+    //         src="/logo.png"
+    //         width="30"
+    //         height="30"
+    //         className="d-inline-block align-top"
+    //       />{" "}
+    //       {/* <text>Exactify</text> */}
+    //     </Navbar.Brand>
+    //     <Navbar.Toggle aria-controls="basic-navbar-nav" />
+    //     <Navbar.Collapse id="basic-navbar-nav">
+    //       <Nav className="mr-auto">
+    //         {/* <Nav.Link as={Link} to="/">Home</Nav.Link> */}
+    //         <Nav.Link as={Link} to="/exchange">
+    //           Exchange Rates
+    //         </Nav.Link>
+    //         <Nav.Link as={Link} to="/loancalculator">
+    //           Loan Calculator
+    //         </Nav.Link>
+    //         {/* <Nav.Link as={Link} to="/carinsurance">Car Insurance</Nav.Link> */}
+    //       </Nav>
+    //     </Navbar.Collapse>
+    //   </Container>
+    // </Navbar>
   );
 };
 
