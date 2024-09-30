@@ -9,13 +9,16 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Table from "react-bootstrap/Table";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  ButtonGroup,
+  Table,
+  Card,
+} from "react-bootstrap";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
 
@@ -55,15 +58,10 @@ const CurrencyExchangeApp = () => {
   const [sgdValue, setSgdValue] = useState("");
   const [myrValue, setMyrValue] = useState("");
 
-  // State variables for SGD to MYR conversion
+  // New state variables for currency conversion
   const [sgdAmount, setSgdAmount] = useState("");
-  const [selectedPlatformSgd, setSelectedPlatformSgd] = useState("CIMB");
-  const [sgdToMyrResult, setSgdToMyrResult] = useState(null);
-
-  // State variables for MYR to SGD conversion
   const [myrAmount, setMyrAmount] = useState("");
-  const [selectedPlatformMyr, setSelectedPlatformMyr] = useState("CIMB");
-  const [myrToSgdResult, setMyrToSgdResult] = useState(null);
+  const [conversionPlatform, setConversionPlatform] = useState("CIMB");
 
   useEffect(() => {
     fetch(
@@ -244,28 +242,6 @@ const CurrencyExchangeApp = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleSgdChange = (e) => {
-    const value = e.target.value;
-    setSgdValue(value);
-
-    if (latestRate?.CIMB && value) {
-      setMyrValue((value * latestRate.CIMB.rate).toFixed(4));
-    } else {
-      setMyrValue("");
-    }
-  };
-
-  const handleMyrChange = (e) => {
-    const value = e.target.value;
-    setMyrValue(value);
-
-    if (latestRate?.CIMB && value) {
-      setSgdValue((value / latestRate.CIMB.rate).toFixed(4));
-    } else {
-      setSgdValue("");
-    }
-  };
-
   function timeAgo(timestamp) {
     const now = new Date();
     const past = new Date(timestamp);
@@ -287,10 +263,30 @@ const CurrencyExchangeApp = () => {
     }
   }
 
+  const handleSgdChange = (value) => {
+    setSgdAmount(value);
+    if (latestRate && value) {
+      const rate = latestRate[conversionPlatform].rate;
+      setMyrAmount((parseFloat(value) * rate).toFixed(2));
+    } else {
+      setMyrAmount("");
+    }
+  };
+
+  const handleMyrChange = (value) => {
+    setMyrAmount(value);
+    if (latestRate && value) {
+      const rate = latestRate[conversionPlatform].rate;
+      setSgdAmount((parseFloat(value) / rate).toFixed(2));
+    } else {
+      setSgdAmount("");
+    }
+  };
+
   return (
     <Container className="mt-2">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-2 mb-2 border-bottom">
-        <h5>Exchange Rates</h5>
+        <h1>Exchange Rates</h1>
         <div className="btn-toolbar mb-md-0">
           <div className="btn-group mr-1">
             {latestRate?.CIMB?.timestamp && (
@@ -374,7 +370,68 @@ const CurrencyExchangeApp = () => {
           </Form.Group>
         </Col> */}
       </Row>
-
+      {/* Currency Conversion Calculator */}
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-4 mb-2 border-bottom">
+        <h5>Currency Conversion Calculator</h5>
+      </div>
+      <Row>
+        <Col xs={12} md={6}>
+          <Card>
+            <Card.Body>
+              <Form>
+                <Form.Group className="mb-3">
+                  <Form.Label>SGD Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={sgdAmount}
+                    onChange={(e) => handleSgdChange(e.target.value)}
+                    placeholder="Enter SGD amount"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>MYR Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={myrAmount}
+                    onChange={(e) => handleMyrChange(e.target.value)}
+                    placeholder="Enter MYR amount"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Platform</Form.Label>
+                  <Form.Select
+                    value={conversionPlatform}
+                    onChange={(e) => {
+                      setConversionPlatform(e.target.value);
+                      // Recalculate based on the new platform
+                      if (sgdAmount) handleSgdChange(sgdAmount);
+                      else if (myrAmount) handleMyrChange(myrAmount);
+                    }}
+                  >
+                    <option value="CIMB">CIMB</option>
+                    <option value="WISE">WISE</option>
+                  </Form.Select>
+                </Form.Group>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} md={6}>
+          <Card>
+            <Card.Body>
+              <h6>Current Exchange Rate</h6>
+              {latestRate && latestRate[conversionPlatform] ? (
+                <p className="h4">
+                  1 SGD = {latestRate[conversionPlatform].rate.toFixed(4)} MYR
+                </p>
+              ) : (
+                <p>Loading latest exchange rate...</p>
+              )}
+              <p className="text-muted">Platform: {conversionPlatform}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
       {/* Chart and Table Section */}
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mt-2 mb-2 border-bottom">
         <h5>Historical Rates</h5>
