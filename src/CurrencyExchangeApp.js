@@ -45,6 +45,7 @@ import {
   WrapItem,
   keyframes,
   usePrefersReducedMotion,
+  Badge,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
@@ -427,15 +428,16 @@ const CurrencyExchangeApp = () => {
       </Flex>
       <Box position="relative" paddingY="5">
         <Divider />
+        {/* <Badge colorScheme="green">1 SGD</Badge> */}
       </Box>
 
       {/* Latest Rates Cards */}
       <StatGroup>
-        <Wrap spacing="70px">
+        <Wrap spacingX="60px" spacingY="10px">
           {latestRate?.CIMB && (
             <WrapItem>
               <Stat>
-                <StatLabel>CIMB</StatLabel>
+                <StatLabel color="#ED1C24">CIMB</StatLabel>
                 <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
                 {renderStatHelpText("CIMB")}
               </Stat>
@@ -445,7 +447,7 @@ const CurrencyExchangeApp = () => {
           {latestRate?.WISE && (
             <WrapItem>
               <Stat>
-                <StatLabel>WISE</StatLabel>
+                <StatLabel color="#9fe870">WISE</StatLabel>
                 <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
                 {renderStatHelpText("WISE")}
               </Stat>
@@ -573,7 +575,7 @@ const CurrencyExchangeApp = () => {
                   type="natural"
                   dataKey="CIMBRate"
                   name="CIMB"
-                  stroke="#FA7070"
+                  stroke="#ED1C24"
                   dot={false}
                   strokeWidth={2}
                   animationEasing="linear"
@@ -581,7 +583,7 @@ const CurrencyExchangeApp = () => {
                 <Line
                   type="natural"
                   dataKey="WISERate"
-                  stroke="#C6EBC5"
+                  stroke="#9fe870"
                   name="WISE"
                   dot={false}
                   strokeWidth={2}
