@@ -43,6 +43,8 @@ import {
   GridItem,
   Wrap,
   WrapItem,
+  keyframes,
+  usePrefersReducedMotion,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
@@ -51,6 +53,16 @@ const calculatePercentageChange = (currentRate, previousRate) => {
   if (previousRate === 0) return 0;
   return ((currentRate - previousRate) / previousRate) * 100;
 };
+
+const fadeIn = keyframes`
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+`;
+
+const fadeOut = keyframes`
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+`;
 
 const calculateAverage = (data) => {
   const rates = data
@@ -93,62 +105,133 @@ const CurrencyExchangeApp = () => {
   const [myrAmount, setMyrAmount] = useState("");
   const [conversionPlatform, setConversionPlatform] = useState("CIMB");
   const [previousRates, setPreviousRates] = useState(null);
+  const [historicalRates, setHistoricalRates] = useState({
+    CIMB: { last24h: null, last7d: null, last1m: null },
+    WISE: { last24h: null, last7d: null, last1m: null },
+  });
+  const [currentPeriod, setCurrentPeriod] = useState("last24h");
+  const [isChanging, setIsChanging] = useState(false);
+  const periods = ["last24h", "last7d", "last1m"];
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  const animationDuration = 0.3;
 
   useEffect(() => {
-    fetch(
-      "https://raw.githubusercontent.com/likweitan/CIMB-exchange-rates/main/exchange_rates.json"
-    )
-      .then((response) => response.json())
-      .then((jsonData) => {
-        const formattedData = jsonData
-          .map((item) => ({
-            timestamp: new Date(item.timestamp),
-            rate: parseFloat(item.exchange_rate),
-            platform: item.platform,
-          }))
-          .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp descending
+    const fetchData = () => {
+      fetch(
+        "https://raw.githubusercontent.com/likweitan/CIMB-exchange-rates/main/exchange_rates.json"
+      )
+        .then((response) => response.json())
+        .then((jsonData) => {
+          const formattedData = jsonData
+            .map((item) => ({
+              timestamp: new Date(item.timestamp),
+              rate: parseFloat(item.exchange_rate),
+              platform: item.platform,
+            }))
+            .sort((a, b) => b.timestamp - a.timestamp);
 
-        setData(formattedData.reverse());
-        console.log(formattedData);
-        // Determine the latest rates for CIMB, WISE, and PANDAREMIT
-        const latestCIMB = formattedData
-          .filter((item) => item.platform === "CIMB")
-          .at(-1);
-        const latestWISE = formattedData
-          .filter((item) => item.platform === "WISE")
-          .at(-1);
-        const latestPANDAREMIT = formattedData
-          .filter((item) => item.platform === "PANDAREMIT")
-          .at(-1);
+          setData(formattedData.reverse());
 
-        setLatestRate({
-          CIMB: latestCIMB,
-          WISE: latestWISE,
-          PANDAREMIT: latestPANDAREMIT,
+          // Determine the latest rates for CIMB and WISE
+          const latestCIMB = formattedData
+            .filter((item) => item.platform === "CIMB")
+            .at(-1);
+          const latestWISE = formattedData
+            .filter((item) => item.platform === "WISE")
+            .at(-1);
+
+          setLatestRate({
+            CIMB: latestCIMB,
+            WISE: latestWISE,
+          });
+
+          // Calculate historical rates
+          const now = new Date();
+          const last24h = new Date(now - 24 * 60 * 60 * 1000);
+          const last7d = new Date(now - 7 * 24 * 60 * 60 * 1000);
+          const last1m = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+          const getHistoricalRate = (platform, date) => {
+            return formattedData
+              .filter(
+                (item) => item.platform === platform && item.timestamp >= date
+              )
+              .at(0);
+          };
+
+          setHistoricalRates({
+            CIMB: {
+              last24h: getHistoricalRate("CIMB", last24h),
+              last7d: getHistoricalRate("CIMB", last7d),
+              last1m: getHistoricalRate("CIMB", last1m),
+            },
+            WISE: {
+              last24h: getHistoricalRate("WISE", last24h),
+              last7d: getHistoricalRate("WISE", last7d),
+              last1m: getHistoricalRate("WISE", last1m),
+            },
+          });
         });
-        // Get the rates from 24 hours ago
-        const previousCIMB = formattedData
-          .filter(
-            (item) =>
-              item.platform === "CIMB" &&
-              item.timestamp.getTime() <= Date.now() - 24 * 60 * 60 * 1000
-          )
-          .at(-1);
+    };
 
-        const previousWISE = formattedData
-          .filter(
-            (item) =>
-              item.platform === "WISE" &&
-              item.timestamp.getTime() <= Date.now() - 24 * 60 * 60 * 1000
-          )
-          .at(-1);
+    fetchData();
+    const dataInterval = setInterval(fetchData, 60000); // Fetch new data every minute
 
-        setPreviousRates({
-          CIMB: previousCIMB,
-          WISE: previousWISE,
+    // Cycle through periods every 5 seconds
+    const periodInterval = setInterval(() => {
+      setIsChanging(true);
+      setTimeout(() => {
+        setCurrentPeriod((prevPeriod) => {
+          const currentIndex = periods.indexOf(prevPeriod);
+          return periods[(currentIndex + 1) % periods.length];
         });
-      });
+        setIsChanging(false);
+      }, animationDuration * 1000);
+    }, 5000);
+
+    return () => {
+      clearInterval(dataInterval);
+      clearInterval(periodInterval);
+    };
   }, []);
+
+  const renderStatHelpText = (platform) => {
+    if (
+      !latestRate ||
+      !latestRate[platform] ||
+      !historicalRates[platform][currentPeriod]
+    ) {
+      return null;
+    }
+
+    const currentRate = latestRate[platform].rate;
+    const historicalRate = historicalRates[platform][currentPeriod].rate;
+    const percentageChange = calculatePercentageChange(
+      currentRate,
+      historicalRate
+    );
+
+    const periodText = {
+      last24h: "24H",
+      last7d: "7D",
+      last1m: "1M",
+    };
+
+    const animation = prefersReducedMotion
+      ? undefined
+      : `${isChanging ? fadeOut : fadeIn} ${animationDuration}s ease-in-out`;
+
+    return (
+      <StatHelpText
+        animation={animation}
+        style={{ opacity: isChanging ? 0 : 1 }}
+      >
+        <StatArrow type={percentageChange >= 0 ? "increase" : "decrease"} />
+        {Math.abs(percentageChange).toFixed(2)}% ({periodText[currentPeriod]})
+      </StatHelpText>
+    );
+  };
 
   useEffect(() => {
     const processData = () => {
@@ -349,48 +432,22 @@ const CurrencyExchangeApp = () => {
       {/* Latest Rates Cards */}
       <StatGroup>
         <Wrap spacing="70px">
-          {latestRate?.CIMB && previousRates?.CIMB && (
+          {latestRate?.CIMB && (
             <WrapItem>
               <Stat>
                 <StatLabel>CIMB</StatLabel>
                 <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
-                <StatHelpText>
-                  <StatArrow
-                    type={
-                      latestRate.CIMB.rate > previousRates.CIMB.rate
-                        ? "increase"
-                        : "decrease"
-                    }
-                  />
-                  {calculatePercentageChange(
-                    latestRate.CIMB.rate,
-                    previousRates.CIMB.rate
-                  ).toFixed(2)}
-                  %
-                </StatHelpText>
+                {renderStatHelpText("CIMB")}
               </Stat>
             </WrapItem>
           )}
 
-          {latestRate?.WISE && previousRates?.WISE && (
+          {latestRate?.WISE && (
             <WrapItem>
               <Stat>
                 <StatLabel>WISE</StatLabel>
                 <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
-                <StatHelpText>
-                  <StatArrow
-                    type={
-                      latestRate.WISE.rate > previousRates.WISE.rate
-                        ? "increase"
-                        : "decrease"
-                    }
-                  />
-                  {calculatePercentageChange(
-                    latestRate.WISE.rate,
-                    previousRates.WISE.rate
-                  ).toFixed(2)}
-                  %
-                </StatHelpText>
+                {renderStatHelpText("WISE")}
               </Stat>
             </WrapItem>
           )}
