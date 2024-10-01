@@ -491,11 +491,11 @@ const CurrencyExchangeApp = () => {
         </Wrap>
       </StatGroup>
       {latestRate?.CIMB?.timestamp && (
-        <Box position="relative" padding="5">
+        <Box position="relative" padding="4">
           <Divider />
           <AbsoluteCenter bg="white" px="4">
             <ChakraTooltip
-              label="Update every 5 minutes"
+              label="Update every 10 minutes"
               aria-label="A tooltip"
             >
               {timeAgo(latestRate.CIMB.timestamp)}
