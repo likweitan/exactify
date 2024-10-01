@@ -48,10 +48,12 @@ import {
   Badge,
   Spinner,
   Tooltip as ChakraTooltip,
+  VStack,
+  Link,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
-
+import Parser from "rss-parser/dist/rss-parser";
 const calculatePercentageChange = (currentRate, previousRate) => {
   if (previousRate === 0) return 0;
   return ((currentRate - previousRate) / previousRate) * 100;
@@ -118,6 +120,33 @@ const CurrencyExchangeApp = () => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const animationDuration = 0.3;
+
+  const [rssItems, setRssItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const rssUrl =
+    "https://corsproxy.io/?https://www.thestar.com.my/rss/Business";
+
+  useEffect(() => {
+    const fetchRssFeed = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const parser = new Parser();
+        const feed = await parser.parseURL(rssUrl);
+        console.log(feed.title);
+        setRssItems(feed.items.slice(0, 5));
+      } catch (err) {
+        setError("Failed to fetch RSS feed");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRssFeed();
+  }, []);
 
   useEffect(() => {
     const fetchData = () => {
@@ -640,6 +669,38 @@ const CurrencyExchangeApp = () => {
             )}
           </Box>
         </Flex>
+      </Box>
+      {/* RSS Feed Section */}
+      <Box mt={4} mb={4}>
+        <Heading as="h2" size="md" mb={4}>
+          Latest News
+        </Heading>
+        {isLoading ? (
+          <Flex
+            // height="100vh" // Full viewport height
+            justifyContent="center" // Center horizontally
+            alignItems="center" // Center vertically
+          >
+            <Spinner />
+          </Flex>
+        ) : error ? (
+          <Text color="red.500">{error}</Text>
+        ) : (
+          <VStack align="stretch" spacing={4}>
+            {rssItems.map((item, index) => (
+              <Box key={index} p={4} borderWidth={1} borderRadius="md">
+                <Heading as="h3" size="sm">
+                  <Link href={item.link} isExternal>
+                    {item.title}
+                  </Link>
+                </Heading>
+                <Text fontSize="sm" mt={2}>
+                  {item.contentSnippet}
+                </Text>
+              </Box>
+            ))}
+          </VStack>
+        )}
       </Box>
     </Container>
   );
