@@ -498,9 +498,7 @@ const CurrencyExchangeApp = () => {
               label="Update every 10 minutes"
               aria-label="A tooltip"
             >
-              <Text fontSize="sm">
-                Updated {timeAgo(latestRate.CIMB.timestamp)}
-              </Text>
+              <Text fontSize="sm">{timeAgo(latestRate.CIMB.timestamp)}</Text>
             </ChakraTooltip>
           </AbsoluteCenter>
         </Box>
