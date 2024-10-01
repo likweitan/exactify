@@ -454,12 +454,12 @@ const CurrencyExchangeApp = () => {
 
   return (
     <Container maxW="container.xl" mt={4}>
-      <Flex justifyContent="space-between" alignItems="center">
+      {/* <Flex justifyContent="space-between" alignItems="center">
         <Heading as="h1" size="lg">
           EXACTIFY
         </Heading>
-      </Flex>
-      <Box position="relative" paddingY="5">
+      </Flex> */}
+      <Box position="relative" paddingBottom="5">
         <Divider />
         {/* <Badge colorScheme="green">1 SGD</Badge> */}
       </Box>

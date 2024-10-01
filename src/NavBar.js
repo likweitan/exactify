@@ -21,40 +21,69 @@ import Container from "react-bootstrap/Container";
 // }
 // export default NavBar;
 
-import React from "react";
-import { Navbar, Nav } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import {
+  Box,
+  Flex,
+  HStack,
+  IconButton,
+  Button,
+  useDisclosure,
+  Stack,
+} from "@chakra-ui/react";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
 const NavBar = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
-    <></>
-    // <Navbar expand="lg" bg="light" data-bs-theme="light">
-    //   <Container>
-    //     <Navbar.Brand as={Link} to="/">
-    //       <img
-    //         alt=""
-    //         src="/logo.png"
-    //         width="30"
-    //         height="30"
-    //         className="d-inline-block align-top"
-    //       />{" "}
-    //       {/* <text>Exactify</text> */}
-    //     </Navbar.Brand>
-    //     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-    //     <Navbar.Collapse id="basic-navbar-nav">
-    //       <Nav className="mr-auto">
-    //         {/* <Nav.Link as={Link} to="/">Home</Nav.Link> */}
-    //         <Nav.Link as={Link} to="/exchange">
-    //           Exchange Rates
-    //         </Nav.Link>
-    //         <Nav.Link as={Link} to="/loancalculator">
-    //           Loan Calculator
-    //         </Nav.Link>
-    //         {/* <Nav.Link as={Link} to="/carinsurance">Car Insurance</Nav.Link> */}
-    //       </Nav>
-    //     </Navbar.Collapse>
-    //   </Container>
-    // </Navbar>
+    <Box bg="teal.500" px={4}>
+      <Flex h={14} alignItems="center" justifyContent="space-between">
+        {/* <IconButton
+          size="md"
+          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+          aria-label="Open Menu"
+          display={{ md: "none" }}
+          onClick={isOpen ? onClose : onOpen}
+        /> */}
+        <HStack spacing={8} alignItems="center">
+          <Box fontWeight="bold" color="white">
+            EXACTIFY
+          </Box>
+          {/* <HStack as="nav" spacing={4} display={{ base: "none", md: "flex" }}>
+            <Button variant="link" color="white">
+              Home
+            </Button>
+            <Button variant="link" color="white">
+              About
+            </Button>
+            <Button variant="link" color="white">
+              Contact
+            </Button>
+          </HStack> */}
+        </HStack>
+        <Flex alignItems="center">
+          {/* <Button colorScheme="teal" size="sm">
+            INFO
+          </Button> */}
+        </Flex>
+      </Flex>
+
+      {isOpen ? (
+        <Box pb={4} display={{ md: "none" }}>
+          <Stack as="nav" spacing={4}>
+            <Button variant="link" color="teal.50">
+              Home
+            </Button>
+            <Button variant="link" color="teal.50">
+              About
+            </Button>
+            <Button variant="link" color="teal.50">
+              Contact
+            </Button>
+          </Stack>
+        </Box>
+      ) : null}
+    </Box>
   );
 };
 
