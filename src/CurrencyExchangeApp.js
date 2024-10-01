@@ -47,6 +47,7 @@ import {
   usePrefersReducedMotion,
   Badge,
   Spinner,
+  Tooltip as ChakraTooltip,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
@@ -462,7 +463,12 @@ const CurrencyExchangeApp = () => {
         <Box position="relative" padding="5">
           <Divider />
           <AbsoluteCenter bg="white" px="4">
-            {timeAgo(latestRate.CIMB.timestamp)}
+            <ChakraTooltip
+              label="Update every 5 minutes"
+              aria-label="A tooltip"
+            >
+              {timeAgo(latestRate.CIMB.timestamp)}
+            </ChakraTooltip>
           </AbsoluteCenter>
         </Box>
       )}
