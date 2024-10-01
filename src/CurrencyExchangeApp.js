@@ -716,7 +716,12 @@ const CurrencyExchangeApp = () => {
                           </Link>
                         </Heading>
                         <Text pt="2" fontSize="sm">
-                          {item.contentSnippet}
+                          {item.contentSnippet
+                            .replace("Read full story", "")
+                            .trim()}
+                        </Text>
+                        <Text pt="0" fontSize="xs" textAlign="right">
+                          {timeAgo(item.pubDate)}
                         </Text>
                       </Box>
                     </Box>
