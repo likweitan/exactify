@@ -102,7 +102,7 @@ const CurrencyExchangeApp = () => {
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
+  const recordsPerPage = 6;
   const yAxisDomain = getYAxisDomain(chartData);
   const [sgdValue, setSgdValue] = useState("");
   const [myrValue, setMyrValue] = useState("");
@@ -498,7 +498,9 @@ const CurrencyExchangeApp = () => {
               label="Update every 10 minutes"
               aria-label="A tooltip"
             >
-              {timeAgo(latestRate.CIMB.timestamp)}
+              <Text fontSize="sm">
+                Updated {timeAgo(latestRate.CIMB.timestamp)}
+              </Text>
             </ChakraTooltip>
           </AbsoluteCenter>
         </Box>
@@ -586,7 +588,7 @@ const CurrencyExchangeApp = () => {
         </Box> */}
         <Flex flexWrap="wrap" mt={4}>
           <Box w={["100%", "50%"]} pr={[0, 4]} mb={4}>
-            <ResponsiveContainer width="100%" height={355}>
+            <ResponsiveContainer width="100%" height={408}>
               <LineChart
                 data={chartData}
                 margin={{
