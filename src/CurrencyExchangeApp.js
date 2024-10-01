@@ -50,6 +50,8 @@ import {
   Tooltip as ChakraTooltip,
   VStack,
   Link,
+  CardHeader,
+  StackDivider,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
@@ -687,18 +689,41 @@ const CurrencyExchangeApp = () => {
           <Text color="red.500">{error}</Text>
         ) : (
           <VStack align="stretch" spacing={4}>
-            {rssItems.map((item, index) => (
-              <Box key={index} p={4} borderWidth={1} borderRadius="md">
-                <Heading as="h3" size="sm">
-                  <Link href={item.link} isExternal>
-                    {item.title}
-                  </Link>
-                </Heading>
-                <Text fontSize="sm" mt={2}>
-                  {item.contentSnippet}
-                </Text>
-              </Box>
-            ))}
+            <Card variant="outline">
+              {/* <CardHeader>
+                  <Heading as="h3" size="sm">
+                    Latest News
+                  </Heading>
+                </CardHeader> */}
+              <CardBody>
+                <Stack divider={<StackDivider />} spacing="4">
+                  {rssItems.map((item, index) => (
+                    <Box>
+                      {/* <Image
+                        objectFit="cover"
+                        maxW={{
+                          base: "100%",
+                          sm: "100px",
+                        }}
+                        src={item.enclosure.url}
+                        alt="Caffe Latte"
+                        mr="10px"
+                      /> */}
+                      <Box>
+                        <Heading size="xs" textTransform="uppercase">
+                          <Link href={item.link} isExternal>
+                            {item.title}
+                          </Link>
+                        </Heading>
+                        <Text pt="2" fontSize="sm">
+                          {item.contentSnippet}
+                        </Text>
+                      </Box>
+                    </Box>
+                  ))}
+                </Stack>
+              </CardBody>
+            </Card>
           </VStack>
         )}
       </Box>
