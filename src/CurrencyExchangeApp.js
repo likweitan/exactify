@@ -301,7 +301,7 @@ const CurrencyExchangeApp = () => {
       : `${isChanging ? fadeOut : fadeIn} ${animationDuration}s ease-in-out`;
 
     return (<Flex
-      height="10vh" // Full viewport height
+      height="15vh" // Full viewport height
       justifyContent="center" // Center horizontally
       alignItems="center" // Center vertically
     >
@@ -558,19 +558,6 @@ const CurrencyExchangeApp = () => {
           </AbsoluteCenter>
         </Box>
       )}
-      
-      {renderAnalysisText("WISE")}
-        <Box position="relative" padding="4">
-          <Divider />
-          <AbsoluteCenter bg="white" px="4">
-            {/* <ChakraTooltip
-              label="Update every 10 minutes"
-              aria-label="A tooltip"
-            > */}
-              <Text fontSize="sm">Powered by LLAMA3.2</Text>
-            {/* </ChakraTooltip> */}
-          </AbsoluteCenter>
-        </Box>
       {/* {latestRate?.CIMB?.timestamp && (
         <Box position="relative" padding="4">
           <Divider />
@@ -666,7 +653,7 @@ const CurrencyExchangeApp = () => {
           </AbsoluteCenter>
         </Box> */}
         <Flex flexWrap="wrap" mt={4}>
-          <Box w={["100%", "50%"]} pr={[0, 4]} mb={4}>
+          <Box w={["100%", "50%"]} pr={[0, 4]} mb={0}>
             <ResponsiveContainer width="100%" height={408}>
               <LineChart
                 data={chartData}
@@ -713,7 +700,7 @@ const CurrencyExchangeApp = () => {
               </LineChart>
             </ResponsiveContainer>
           </Box>
-          <Box w={["100%", "50%"]} pl={[0, 4]} mb={4}>
+          <Box w={["100%", "50%"]} pl={[0, 4]} mb={0}>
             <Table variant="simple" size="md">
               <Thead>
                 <Tr>
@@ -753,6 +740,21 @@ const CurrencyExchangeApp = () => {
           </Box>
         </Flex>
       </Box>
+      
+      {renderAnalysisText("WISE")}
+        <Box position="relative" padding="4">
+          <Divider />
+          <AbsoluteCenter bg="white" px="4">
+            {/* <ChakraTooltip
+              label="Update every 10 minutes"
+              aria-label="A tooltip"
+            > */}
+              <Text fontSize="sm">Powered by <Link href="https://www.llama.com/" color="teal.500">
+              LLAMA3.2
+              </Link></Text>
+            {/* </ChakraTooltip> */}
+          </AbsoluteCenter>
+        </Box>
       {/* RSS Feed Section */}
       <Box mt={4} mb={4}>
         <Heading as="h2" size="md" mb={4}>
