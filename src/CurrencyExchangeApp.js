@@ -52,9 +52,14 @@ import {
   Link,
   CardHeader,
   StackDivider,
+  InputGroup,
+  InputLeftAddon,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
+import SGFlag from './assets/flag-sg.png';
+import MYFlag from './assets/flag-my.png';
+import ExchangeIcon from './assets/icon-exchange.jpg';
 import Parser from "rss-parser/dist/rss-parser";
 import CurrencyExchangeLocator from "./CurrencyExchangeLocator";
 const calculatePercentageChange = (currentRate, previousRate) => {
@@ -312,7 +317,7 @@ const CurrencyExchangeApp = () => {
       >
         {analysisText[currentPeriod]}
       </Text>
-      </Flex>
+    </Flex>
     );
   };
 
@@ -374,13 +379,13 @@ const CurrencyExchangeApp = () => {
         date: formatDate(new Date(Number(key))),
         CIMBRate: groupedData[key]["CIMB"]
           ? (
-              groupedData[key]["CIMB"].sum / groupedData[key]["CIMB"].count
-            ).toFixed(4)
+            groupedData[key]["CIMB"].sum / groupedData[key]["CIMB"].count
+          ).toFixed(4)
           : "-",
         WISERate: groupedData[key]["WISE"]
           ? (
-              groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count
-            ).toFixed(3)
+            groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count
+          ).toFixed(3)
           : "-",
       }));
 
@@ -516,11 +521,11 @@ const CurrencyExchangeApp = () => {
             <WrapItem>
               <Stat>
                 <StatLabel color="#ED1C24">CIMB</StatLabel>
-            <ChakraTooltip
-              label={"1 SGD = " + latestRate.CIMB.rate.toFixed(4) + " MYR"}
-              aria-label="A tooltip"
-            >
-                <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
+                <ChakraTooltip
+                  label={"1 SGD = " + latestRate.CIMB.rate.toFixed(4) + " MYR"}
+                  aria-label="A tooltip"
+                >
+                  <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
                 </ChakraTooltip>
                 {renderStatHelpText("CIMB")}
               </Stat>
@@ -533,12 +538,12 @@ const CurrencyExchangeApp = () => {
             <WrapItem>
               <Stat>
                 <StatLabel color="#9fe870">WISE</StatLabel>
-            <ChakraTooltip
-              label={"1 SGD = " + latestRate.WISE.rate.toFixed(4) + " MYR"}
-              aria-label="A tooltip"
-            >
-                <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
-            </ChakraTooltip>
+                <ChakraTooltip
+                  label={"1 SGD = " + latestRate.WISE.rate.toFixed(4) + " MYR"}
+                  aria-label="A tooltip"
+                >
+                  <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
+                </ChakraTooltip>
                 {renderStatHelpText("WISE")}
               </Stat>
             </WrapItem>
@@ -572,14 +577,14 @@ const CurrencyExchangeApp = () => {
         </Box>
       )} */}
       {/* Currency Conversion Calculator */}
-      {/* <Box mt={0}>
+      <Box mt={0}>
         <Flex justifyContent="space-between" alignItems="center">
           <Heading as="h1" size="md">
             Conversion
           </Heading>
           <Select
             w="auto"
-            size="md"
+            size="sm"
             value={conversionPlatform}
             onChange={(e) => {
               setConversionPlatform(e.target.value);
@@ -592,42 +597,39 @@ const CurrencyExchangeApp = () => {
             <option value="WISE">WISE</option>
           </Select>
         </Flex>
-        <Flex flexWrap="wrap">
-          <Box w={["100%", "100%"]} mt={4} mb={4}>
-            <Wrap>
-              <WrapItem>
-                <FormControl>
-                  <FormLabel>SGD</FormLabel>
-                  <Input
-                    type="number"
-                    value={sgdAmount}
-                    onChange={(e) => handleSgdChange(e.target.value)}
-                    placeholder="Enter SGD amount"
-                  />
-                </FormControl>
-              </WrapItem>
-              <WrapItem>
-                <Text>X</Text>
-              </WrapItem>
-              <WrapItem>
-                <FormControl>
-                  <FormLabel>MYR</FormLabel>
-                  <Input
-                    type="number"
-                    value={myrAmount}
-                    onChange={(e) => handleMyrChange(e.target.value)}
-                    placeholder="Enter MYR amount"
-                  />
-                </FormControl>
-              </WrapItem>
-            </Wrap>
+        <Flex flexWrap="wrap" mt={4}>
+          <Box w={["100%", "45%"]} px={1} mb={4}>
+            <FormControl>
+              <InputGroup>
+                <InputLeftAddon pointerEvents='none'><img src={SGFlag} /></InputLeftAddon>
+                <Input
+                  type="number"
+                  value={sgdAmount}
+                  onChange={(e) => handleSgdChange(e.target.value)}
+                  placeholder="SGD" variant='outline'
+                />
+              </InputGroup>
+            </FormControl>
+          </Box>
+          <Box w={["0%", "10%"]} paddingX={10}><img src={ExchangeIcon} /></Box>
+          <Box w={["100%", "45%"]} px={1} mb={0}>
+            <FormControl>
+              <InputGroup>
+                <InputLeftAddon pointerEvents='none'><img src={MYFlag}/></InputLeftAddon>
+                <Input
+                  type="number"
+                  value={myrAmount}
+                  onChange={(e) => handleMyrChange(e.target.value)}
+                  placeholder="MYR" variant='outline'
+                />
+              </InputGroup>
+            </FormControl>
           </Box>
         </Flex>
-      </Box> 
-      <Box position="relative" padding="5">
+      </Box>
+      <Box position="relative" padding="4">
         <Divider />
       </Box>
-*/}
       {/* Historical Rates */}
       <Box mt={4}>
         <Flex justifyContent="space-between" alignItems="center">
@@ -740,21 +742,21 @@ const CurrencyExchangeApp = () => {
           </Box>
         </Flex>
       </Box>
-      
+
       {renderAnalysisText("WISE")}
-        <Box position="relative" padding="4">
-          <Divider />
-          <AbsoluteCenter bg="white" px="4">
-            {/* <ChakraTooltip
+      <Box position="relative" padding="4">
+        <Divider />
+        <AbsoluteCenter bg="white" px="4">
+          {/* <ChakraTooltip
               label="Update every 10 minutes"
               aria-label="A tooltip"
             > */}
-              <Text fontSize="sm">Powered by <Link href="https://www.llama.com/" color="teal.500">
-              LLAMA3.2
-              </Link></Text>
-            {/* </ChakraTooltip> */}
-          </AbsoluteCenter>
-        </Box>
+          <Text fontSize="sm">Powered by <Link href="https://www.llama.com/" color="teal.500">
+            LLAMA3.2
+          </Link></Text>
+          {/* </ChakraTooltip> */}
+        </AbsoluteCenter>
+      </Box>
       {/* RSS Feed Section */}
       <Box mt={4} mb={4}>
         <Heading as="h2" size="md" mb={4}>
