@@ -56,6 +56,7 @@ import {
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
 import Parser from "rss-parser/dist/rss-parser";
+import CurrencyExchangeLocator from "./CurrencyExchangeLocator";
 const calculatePercentageChange = (currentRate, previousRate) => {
   if (previousRate === 0) return 0;
   return ((currentRate - previousRate) / previousRate) * 100;
@@ -128,7 +129,7 @@ const CurrencyExchangeApp = () => {
   const [error, setError] = useState(null);
 
   const rssUrl =
-    "https://corsproxy.io/?https://www.thestar.com.my/rss/Business";
+    "https://corsproxy.io/?https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936";
 
   useEffect(() => {
     const fetchRssFeed = async () => {
@@ -264,6 +265,54 @@ const CurrencyExchangeApp = () => {
         <StatArrow type={percentageChange >= 0 ? "increase" : "decrease"} />
         {Math.abs(percentageChange).toFixed(2)}% ({periodText[currentPeriod]})
       </StatHelpText>
+    );
+  };
+
+  const renderAnalysisText = (platform) => {
+    if (
+      !latestRate ||
+      !latestRate[platform] ||
+      !historicalRates[platform][currentPeriod]
+    ) {
+      return null;
+    }
+
+    const currentRate = latestRate[platform].rate;
+    const historicalRate = historicalRates[platform][currentPeriod].rate;
+    const percentageChange = calculatePercentageChange(
+      currentRate,
+      historicalRate
+    );
+
+    const periodText = {
+      last24h: "24H",
+      last7d: "7D",
+      last1m: "1M",
+    };
+
+    const analysisText = {
+      last24h: "Exchange rates will continue to increase over time, with some fluctuations.",
+      last7d: "The upward trend is expected to persist, at least in the short term (up to 2 weeks).",
+      last1m: "CIMB's exchange rate may experience more significant fluctuations due to its relatively volatile daily changes and potential influence from seasonal factors.",
+    };
+
+    const animation = prefersReducedMotion
+      ? undefined
+      : `${isChanging ? fadeOut : fadeIn} ${animationDuration}s ease-in-out`;
+
+    return (<Flex
+      height="10vh" // Full viewport height
+      justifyContent="center" // Center horizontally
+      alignItems="center" // Center vertically
+    >
+      <Text
+        animation={animation}
+        style={{ opacity: isChanging ? 0 : 1 }}
+        fontSize="md"
+      >
+        {analysisText[currentPeriod]}
+      </Text>
+      </Flex>
     );
   };
 
@@ -459,10 +508,6 @@ const CurrencyExchangeApp = () => {
           EXACTIFY
         </Heading>
       </Flex> */}
-      <Box position="relative" paddingBottom="5">
-        <Divider />
-        {/* <Badge colorScheme="green">1 SGD</Badge> */}
-      </Box>
 
       {/* Latest Rates Cards */}
       <StatGroup>
@@ -471,7 +516,12 @@ const CurrencyExchangeApp = () => {
             <WrapItem>
               <Stat>
                 <StatLabel color="#ED1C24">CIMB</StatLabel>
+            <ChakraTooltip
+              label={"1 SGD = " + latestRate.CIMB.rate.toFixed(4) + " MYR"}
+              aria-label="A tooltip"
+            >
                 <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
+                </ChakraTooltip>
                 {renderStatHelpText("CIMB")}
               </Stat>
             </WrapItem>
@@ -483,7 +533,12 @@ const CurrencyExchangeApp = () => {
             <WrapItem>
               <Stat>
                 <StatLabel color="#9fe870">WISE</StatLabel>
+            <ChakraTooltip
+              label={"1 SGD = " + latestRate.WISE.rate.toFixed(4) + " MYR"}
+              aria-label="A tooltip"
+            >
                 <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
+            </ChakraTooltip>
                 {renderStatHelpText("WISE")}
               </Stat>
             </WrapItem>
@@ -503,6 +558,32 @@ const CurrencyExchangeApp = () => {
           </AbsoluteCenter>
         </Box>
       )}
+      
+      {renderAnalysisText("WISE")}
+        <Box position="relative" padding="4">
+          <Divider />
+          <AbsoluteCenter bg="white" px="4">
+            {/* <ChakraTooltip
+              label="Update every 10 minutes"
+              aria-label="A tooltip"
+            > */}
+              <Text fontSize="sm">Powered by LLAMA3.2</Text>
+            {/* </ChakraTooltip> */}
+          </AbsoluteCenter>
+        </Box>
+      {/* {latestRate?.CIMB?.timestamp && (
+        <Box position="relative" padding="4">
+          <Divider />
+          <AbsoluteCenter bg="white" px="2">
+            <ChakraTooltip
+              label="Update every 10 minutes"
+              aria-label="A tooltip"
+            >
+              {renderAnalysisText("WISE")}
+            </ChakraTooltip>
+          </AbsoluteCenter>
+        </Box>
+      )} */}
       {/* Currency Conversion Calculator */}
       {/* <Box mt={0}>
         <Flex justifyContent="space-between" alignItems="center">
@@ -732,6 +813,7 @@ const CurrencyExchangeApp = () => {
           </VStack>
         )}
       </Box>
+      {/* <Box><CurrencyExchangeLocator /></Box> */}
     </Container>
   );
 };

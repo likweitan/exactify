@@ -38,13 +38,6 @@ const NavBar = () => {
   return (
     <Box bg="teal.500" px={4}>
       <Flex h={14} alignItems="center" justifyContent="space-between">
-        {/* <IconButton
-          size="md"
-          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          aria-label="Open Menu"
-          display={{ md: "none" }}
-          onClick={isOpen ? onClose : onOpen}
-        /> */}
         <HStack spacing={8} alignItems="center">
           <Box fontWeight="bold" color="white">
             EXACTIFY
@@ -66,18 +59,25 @@ const NavBar = () => {
             INFO
           </Button> */}
         </Flex>
+        <IconButton bg="teal.500"
+          size="md"
+          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+          aria-label="Open Menu"
+          display={{ md: "none" }}
+          onClick={isOpen ? onClose : onOpen}
+        />
       </Flex>
 
       {isOpen ? (
         <Box pb={4} display={{ md: "none" }}>
           <Stack as="nav" spacing={4}>
-            <Button variant="link" color="teal.50">
+            <Button variant="ghost" color="teal.50">
               Home
             </Button>
-            <Button variant="link" color="teal.50">
+            <Button variant="ghost" color="teal.50">
               About
             </Button>
-            <Button variant="link" color="teal.50">
+            <Button variant="ghost" color="teal.50">
               Contact
             </Button>
           </Stack>
