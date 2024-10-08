@@ -62,6 +62,8 @@ import MYFlag from './assets/flag-my.png';
 import ExchangeIcon from './assets/icon-exchange.jpg';
 import Parser from "rss-parser/dist/rss-parser";
 import CurrencyExchangeLocator from "./CurrencyExchangeLocator";
+import ConversionSymbol from "./ConversionSymbol";
+
 const calculatePercentageChange = (currentRate, previousRate) => {
   if (previousRate === 0) return 0;
   return ((currentRate - previousRate) / previousRate) * 100;
@@ -597,35 +599,39 @@ const CurrencyExchangeApp = () => {
             <option value="WISE">WISE</option>
           </Select>
         </Flex>
-        <Flex flexWrap="wrap" mt={4}>
-          <Box w={["100%", "45%"]} px={1} mb={4}>
-            <FormControl>
-              <InputGroup>
-                <InputLeftAddon pointerEvents='none'><img src={SGFlag} /></InputLeftAddon>
-                <Input
-                  type="number"
-                  value={sgdAmount}
-                  onChange={(e) => handleSgdChange(e.target.value)}
-                  placeholder="SGD" variant='outline'
-                />
-              </InputGroup>
-            </FormControl>
-          </Box>
-          <Box w={["0%", "10%"]} paddingX={10}><img src={ExchangeIcon} /></Box>
-          <Box w={["100%", "45%"]} px={1} mb={0}>
-            <FormControl>
-              <InputGroup>
-                <InputLeftAddon pointerEvents='none'><img src={MYFlag}/></InputLeftAddon>
-                <Input
-                  type="number"
-                  value={myrAmount}
-                  onChange={(e) => handleMyrChange(e.target.value)}
-                  placeholder="MYR" variant='outline'
-                />
-              </InputGroup>
-            </FormControl>
-          </Box>
-        </Flex>
+        <Flex flexWrap="wrap" justifyContent="center" mt={4}>
+      <Box w={["70%", "20%"]} px={1} mb={4}>
+        <FormControl>
+          <InputGroup>
+            <InputLeftAddon pointerEvents='none'><img src={SGFlag} alt="SGD Flag" /></InputLeftAddon>
+            <Input
+              type="number"
+              value={sgdAmount}
+              onChange={(e) => handleSgdChange(e.target.value)}
+              placeholder="SGD"
+              variant='outline'
+            />
+          </InputGroup>
+        </FormControl>
+      </Box>
+      <Box w={["70%", "10%"]} px={1} mb={4} display="flex" justifyContent="center" alignItems="center">
+        <ConversionSymbol />
+      </Box>
+      <Box w={["70%", "20%"]} px={1} mb={4}>
+        <FormControl>
+          <InputGroup>
+            <InputLeftAddon pointerEvents='none'><img src={MYFlag} alt="MYR Flag" /></InputLeftAddon>
+            <Input
+              type="number"
+              value={myrAmount}
+              onChange={(e) => handleMyrChange(e.target.value)}
+              placeholder="MYR"
+              variant='outline'
+            />
+          </InputGroup>
+        </FormControl>
+      </Box>
+    </Flex>
       </Box>
       <Box position="relative" padding="4">
         <Divider />
