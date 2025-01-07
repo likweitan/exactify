@@ -933,18 +933,25 @@ const CurrencyExchangeApp = () => {
                     <TabPanel p={0} pt={4}>
                       <Card>
                         <CardBody>
-                          <Box h="400px">
+                          <Box 
+                            h={{ base: "300px", md: "400px" }} 
+                            mx={{ base: -4, md: 0 }}  // Negative margin on mobile to allow full width
+                          >
                             <ResponsiveContainer>
                               <LineChart
                                 data={filterDataByTimeFrame(chartData, timeFrame)}
                                 margin={{
-                                  top: 20,
-                                  right: 20,
-                                  left: 20,
-                                  bottom: 20,
+                                  top: 10,
+                                  right: 10,
+                                  left: 0,  // Removed left margin since we're hiding Y-axis labels
+                                  bottom: 40,
                                 }}
                               >
-                                <CartesianGrid strokeDasharray="3 3" />
+                                <CartesianGrid 
+                                  strokeDasharray="3 3" 
+                                  vertical={false}  // Only show horizontal grid lines
+                                  opacity={0.5}
+                                />
                                 <XAxis
                                   dataKey="date"
                                   tickFormatter={(value) => {
@@ -952,7 +959,6 @@ const CurrencyExchangeApp = () => {
                                     if (timeFrame === "48h") {
                                       return date.toLocaleTimeString([], { 
                                         hour: '2-digit', 
-                                        minute: '2-digit',
                                         hour12: false 
                                       });
                                     } else if (timeFrame === "1w" || timeFrame === "1m") {
@@ -961,21 +967,36 @@ const CurrencyExchangeApp = () => {
                                         day: 'numeric'
                                       });
                                     } else {
-                                      // For 6m and 12m views
                                       return date.toLocaleDateString([], {
                                         month: 'short',
                                         year: '2-digit'
                                       });
                                     }
                                   }}
-                                  interval={timeFrame === "48h" ? 3 : timeFrame === "6m" || timeFrame === "12m" ? 1 : 0}
-                                  angle={timeFrame === "48h" ? -45 : 0}
-                                  textAnchor="end"
-                                  height={60}
+                                  interval={timeFrame === "48h" ? 6 : timeFrame === "6m" || timeFrame === "12m" ? 1 : 0}
+                                  angle={0}
+                                  tick={{ fontSize: 12, fill: '#718096' }}
+                                  axisLine={{ stroke: '#E2E8F0' }}
+                                  tickLine={{ stroke: '#E2E8F0' }}
                                 />
-                                <YAxis domain={yAxisDomain} />
-                                <Tooltip content={customTooltip} />
-                                <Legend />
+                                <YAxis 
+                                  hide  // Hide Y-axis labels
+                                  domain={yAxisDomain}
+                                />
+                                <Tooltip 
+                                  content={customTooltip}
+                                  cursor={{ stroke: '#718096', strokeWidth: 1, strokeDasharray: '3 3' }}
+                                />
+                                <Legend 
+                                  verticalAlign="top"
+                                  height={36}
+                                  iconType="circle"
+                                  iconSize={8}
+                                  wrapperStyle={{
+                                    paddingBottom: '20px',
+                                    fontSize: '14px'
+                                  }}
+                                />
                                 <Line
                                   type="monotone"
                                   dataKey="CIMBRate"
@@ -983,18 +1004,54 @@ const CurrencyExchangeApp = () => {
                                   name="CIMB"
                                   dot={false}
                                   strokeWidth={2}
+                                  activeDot={{ r: 6, stroke: '#ED1C24', strokeWidth: 2, fill: '#FFF' }}
                                 />
                                 <Line
                                   type="monotone"
                                   dataKey="WISERate"
-                                  stroke="#9fe870"
+                                  stroke="#00B9FF"
                                   name="WISE"
                                   dot={false}
                                   strokeWidth={2}
+                                  activeDot={{ r: 6, stroke: '#00B9FF', strokeWidth: 2, fill: '#FFF' }}
                                 />
                               </LineChart>
                             </ResponsiveContainer>
                           </Box>
+
+                          {/* Add min/max indicators below chart */}
+                          <SimpleGrid 
+                            columns={2} 
+                            spacing={4} 
+                            mt={4}
+                            fontSize="sm"
+                            display={{ base: 'grid', md: 'none' }}  // Only show on mobile
+                          >
+                            <Box p={2} bg="gray.50" borderRadius="md">
+                              <Text color="gray.500">Lowest</Text>
+                              <Text fontWeight="bold" color="red.500">
+                                {Math.min(
+                                  ...filterDataByTimeFrame(chartData, timeFrame)
+                                    .map(item => Math.min(
+                                      parseFloat(item.CIMBRate) || Infinity,
+                                      parseFloat(item.WISERate) || Infinity
+                                    ))
+                                ).toFixed(4)}
+                              </Text>
+                            </Box>
+                            <Box p={2} bg="gray.50" borderRadius="md">
+                              <Text color="gray.500">Highest</Text>
+                              <Text fontWeight="bold" color="green.500">
+                                {Math.max(
+                                  ...filterDataByTimeFrame(chartData, timeFrame)
+                                    .map(item => Math.max(
+                                      parseFloat(item.CIMBRate) || -Infinity,
+                                      parseFloat(item.WISERate) || -Infinity
+                                    ))
+                                ).toFixed(4)}
+                              </Text>
+                            </Box>
+                          </SimpleGrid>
                         </CardBody>
                       </Card>
                     </TabPanel>
