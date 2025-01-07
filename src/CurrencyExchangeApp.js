@@ -737,18 +737,16 @@ const CurrencyExchangeApp = () => {
     const diff = Math.floor((now - past) / 1000); // difference in seconds
 
     if (diff < 60) {
-      return `${diff} seconds ago`;
+      return `${diff}s`;
     } else if (diff < 3600) {
-      // less than an hour
       const minutes = Math.floor(diff / 60);
-      return `${minutes} minutes ago`;
+      return `${minutes}m`;
     } else if (diff < 86400) {
-      // less than a day
       const hours = Math.floor(diff / 3600);
-      return `${hours} hours ago`;
+      return `${hours}h`;
     } else {
       const days = Math.floor(diff / 86400);
-      return `${days} days ago`;
+      return `${days}d`;
     }
   }
 
@@ -801,9 +799,9 @@ const CurrencyExchangeApp = () => {
           <Container maxW="container.xl" py={4}>
             <Flex justify="space-between" align="center">
               <Heading size="lg" color="brand.teal">Exactify</Heading>
-              <HStack spacing={4}>
+              <HStack spacing={{ base: 2, md: 4 }}>
                 <Select
-                  w="auto"
+                  w={{ base: "110px", md: "auto" }}
                   size="sm"
                   value={timeFrame}
                   onChange={(e) => setTimeFrame(e.target.value)}
@@ -815,8 +813,16 @@ const CurrencyExchangeApp = () => {
                     </option>
                   ))}
                 </Select>
-                <Text fontSize="sm" color="gray.500">
-                  Updated {latestRate?.CIMB && timeAgo(latestRate.CIMB.timestamp)}
+                <Text 
+                  fontSize="sm" 
+                  color="gray.500"
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Box as="span" display={{ base: 'none', md: 'inline' }}>Updated</Box>
+                  {latestRate?.CIMB && timeAgo(latestRate.CIMB.timestamp)}
+                  <Box as="span" display={{ base: 'none', md: 'inline' }}>ago</Box>
                 </Text>
               </HStack>
             </Flex>
