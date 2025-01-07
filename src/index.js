@@ -19,14 +19,12 @@ root.render(
   <React.StrictMode>
     <ChakraProvider>
       <Router>
-        <NavBar />
         <Routes>
           <Route path="/" element={<CurrencyExchangeApp />} />
           <Route path="/exchange" element={<CurrencyExchangeApp />} />
           <Route path="/loancalculator" element={<LoanCalculator />} />
           <Route path="/carinsurance" element={<CarInsuranceCalculator />} />
         </Routes>
-        <Footer />
         <Analytics />
       </Router>
     </ChakraProvider>

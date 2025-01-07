@@ -27,33 +27,36 @@ import {
   ButtonGroup,
   Input,
   FormControl,
-  FormLabel,
   Card,
   CardBody,
-  Stack,
   Stat,
   StatLabel,
   StatNumber,
   StatHelpText,
   StatArrow,
-  StatGroup,
-  Divider,
-  AbsoluteCenter,
-  Grid,
-  GridItem,
-  Wrap,
-  WrapItem,
-  keyframes,
-  usePrefersReducedMotion,
-  Badge,
-  Spinner,
-  Tooltip as ChakraTooltip,
+  SimpleGrid,
+  IconButton,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  useColorModeValue,
   VStack,
-  Link,
-  CardHeader,
-  StackDivider,
   InputGroup,
   InputLeftAddon,
+  ChakraProvider,
+  extendTheme,
+  Link,
+  keyframes,
+  useColorMode,
+  useColorModeValue as useColorModeValueHook,
+  usePrefersReducedMotion,
+  Badge,
+  GridItem,
+  Box as ChakraBox,
+  HStack,
+  Icon,
 } from "@chakra-ui/react";
 import CIMBLogo from "./assets/cimb_logo.png";
 import WiseLogo from "./assets/wise_logo.png";
@@ -63,21 +66,22 @@ import ExchangeIcon from './assets/icon-exchange.jpg';
 import Parser from "rss-parser/dist/rss-parser";
 import CurrencyExchangeLocator from "./CurrencyExchangeLocator";
 import ConversionSymbol from "./ConversionSymbol";
+import { InfoOutlineIcon } from '@chakra-ui/icons';
 
 const calculatePercentageChange = (currentRate, previousRate) => {
   if (previousRate === 0) return 0;
   return ((currentRate - previousRate) / previousRate) * 100;
 };
 
-const fadeIn = keyframes`
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
-`;
+const fadeIn = keyframes({
+  "0%": { opacity: 0, transform: "translateY(10px)" },
+  "100%": { opacity: 1, transform: "translateY(0)" }
+});
 
-const fadeOut = keyframes`
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-10px); }
-`;
+const fadeOut = keyframes({
+  "0%": { opacity: 1, transform: "translateY(0)" },
+  "100%": { opacity: 0, transform: "translateY(-10px)" }
+});
 
 const calculateAverage = (data) => {
   const rates = data
@@ -103,40 +107,292 @@ const getYAxisDomain = (data) => {
   ];
 };
 
+const calculateRateStats = (data, platform, timeFrame) => {
+  const rates = data
+    .filter(item => item[`${platform}Rate`] !== "-")
+    .map(item => parseFloat(item[`${platform}Rate`]));
+
+  if (rates.length === 0) return null;
+
+  const current = rates[rates.length - 1];
+  const prev = rates[rates.length - 2] || rates[rates.length - 1];
+  const avg = rates.reduce((a, b) => a + b, 0) / rates.length;
+  const max = Math.max(...rates);
+  const min = Math.min(...rates);
+  const change = ((current - prev) / prev) * 100;
+
+  return {
+    current,
+    average: avg,
+    highest: max,
+    lowest: min,
+    change,
+    trend: rates.slice(-5).every((rate, i, arr) => i === 0 || rate >= arr[i - 1]) ? "up" :
+           rates.slice(-5).every((rate, i, arr) => i === 0 || rate <= arr[i - 1]) ? "down" : "neutral"
+  };
+};
+
+const RateCard = ({ platform, rate, color, logo, data, timeFrame }) => {
+  const stats = calculateRateStats(data, platform, timeFrame);
+  const bgColor = useColorModeValue('white', 'gray.700');
+  const statsBgColor = useColorModeValue('gray.50', 'gray.700');
+  
+  return (
+    <Card
+      bg={bgColor}
+      shadow="sm"
+      transition="all 0.2s"
+      _hover={{ shadow: 'md' }}
+      borderRadius="lg"
+      overflow="hidden"
+    >
+      <Box 
+        bg={color} 
+        h="4px" 
+        w="100%"
+      />
+      <CardBody p={4}>
+        <VStack spacing={4} align="stretch">
+          {/* Header */}
+          <Flex justifyContent="space-between" alignItems="center">
+            <Flex alignItems="center" gap={3}>
+              <Image 
+                src={logo} 
+                alt={platform} 
+                boxSize="28px"
+                borderRadius="full"
+                p={1}
+                bg={statsBgColor}
+              />
+              <VStack spacing={0} align="start">
+                <Text fontWeight="bold" color="gray.700">{platform}</Text>
+                <Text fontSize="xs" color="gray.500">
+                  {timeFrame === "48h" ? "Last 48 Hours" : 
+                   timeFrame === "1w" ? "Last Week" :
+                   timeFrame === "1m" ? "Last Month" :
+                   timeFrame === "6m" ? "Last 6 Months" : "Last Year"}
+                </Text>
+              </VStack>
+            </Flex>
+            {stats?.trend && (
+              <Badge 
+                colorScheme={stats.trend === "up" ? "green" : stats.trend === "down" ? "red" : "gray"}
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="full"
+                fontSize="xs"
+              >
+                <Flex alignItems="center" gap={1}>
+                  {stats.trend === "up" ? "▲ " : stats.trend === "down" ? "▼ " : "■ "}
+                  {stats.trend === "up" ? "Rising" : stats.trend === "down" ? "Falling" : "Stable"}
+                </Flex>
+              </Badge>
+            )}
+          </Flex>
+
+          {/* Rate Display */}
+          <Box 
+            bg={statsBgColor}
+            p={3} 
+            borderRadius="md"
+            textAlign="center"
+          >
+            <Text fontSize="3xl" fontWeight="bold" color={color}>
+              {rate.toFixed(4)}
+            </Text>
+            <Text fontSize="sm" color="gray.500">MYR per SGD</Text>
+          </Box>
+
+          {/* Stats Grid */}
+          {stats && (
+            <SimpleGrid columns={2} spacing={4} fontSize="sm">
+              {[
+                {
+                  label: "24h Change",
+                  value: `${stats.change >= 0 ? "+" : ""}${stats.change.toFixed(2)}%`,
+                  color: stats.change >= 0 ? "green.500" : "red.500"
+                },
+                {
+                  label: "Average",
+                  value: stats.average.toFixed(4)
+                },
+                {
+                  label: "Highest",
+                  value: stats.highest.toFixed(4),
+                  color: "green.500"
+                },
+                {
+                  label: "Lowest",
+                  value: stats.lowest.toFixed(4),
+                  color: "red.500"
+                }
+              ].map((item, index) => (
+                <Box 
+                  key={index}
+                  bg={statsBgColor}
+                  p={2}
+                  borderRadius="md"
+                >
+                  <Flex justifyContent="space-between" alignItems="baseline">
+                    <Text color="gray.500">{item.label}</Text>
+                    <Text 
+                      color={item.color} 
+                      fontWeight="semibold"
+                    >
+                      {item.value}
+                    </Text>
+                  </Flex>
+                </Box>
+              ))}
+            </SimpleGrid>
+          )}
+        </VStack>
+      </CardBody>
+    </Card>
+  );
+};
+
+const theme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        bg: "gray.50",
+      }
+    }
+  },
+  components: {
+    Card: {
+      baseStyle: {
+        container: {
+          borderRadius: 'lg',
+          overflow: 'hidden',
+          transition: 'all 0.2s',
+          _hover: { shadow: 'md' }
+        }
+      }
+    },
+    Button: {
+      variants: {
+        outline: {
+          borderRadius: 'full'
+        }
+      }
+    }
+  },
+  colors: {
+    brand: {
+      cimb: "#ED1C24",
+      wise: "#00B9FF",
+      teal: "#319795"
+    }
+  }
+});
+
+const formatDateTime = (date, timeFrame) => {
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+  
+  if (timeFrame === "48h") {
+    return date.toLocaleString([], {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  } else if (timeFrame === "1w" || timeFrame === "1m") {
+    return date.toLocaleDateString([], {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } else {
+    // For 6m and 12m views
+    return date.toLocaleDateString([], {
+      year: 'numeric',
+      month: 'long'
+    });
+  }
+};
+
+const Section = ({ title, children, action }) => (
+  <Box mb={8}>
+    <Flex 
+      justify="space-between" 
+      align="center" 
+      mb={4}
+    >
+      <Heading size="md">{title}</Heading>
+      {action}
+    </Flex>
+    {children}
+  </Box>
+);
+
 const CurrencyExchangeApp = () => {
   const [data, setData] = useState([]);
-  const [timeFrame, setTimeFrame] = useState("day");
+  const [timeFrame, setTimeFrame] = useState("48h");
   const [chartData, setChartData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [latestRate, setLatestRate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6;
-  const yAxisDomain = getYAxisDomain(chartData);
-  const [sgdValue, setSgdValue] = useState("");
-  const [myrValue, setMyrValue] = useState("");
-
-  // New state variables for currency conversion
   const [sgdAmount, setSgdAmount] = useState("");
   const [myrAmount, setMyrAmount] = useState("");
   const [conversionPlatform, setConversionPlatform] = useState("CIMB");
-  const [previousRates, setPreviousRates] = useState(null);
+  const [bestTimeToExchange, setBestTimeToExchange] = useState(null);
+  const [currentPeriod, setCurrentPeriod] = useState("last24h");
+  const [isChanging, setIsChanging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [historicalRates, setHistoricalRates] = useState({
     CIMB: { last24h: null, last7d: null, last1m: null },
     WISE: { last24h: null, last7d: null, last1m: null },
   });
-  const [currentPeriod, setCurrentPeriod] = useState("last24h");
-  const [isChanging, setIsChanging] = useState(false);
+
+  // Constants
+  const recordsPerPage = 6;
+  const yAxisDomain = getYAxisDomain(chartData);
   const periods = ["last24h", "last7d", "last1m"];
   const prefersReducedMotion = usePrefersReducedMotion();
-
   const animationDuration = 0.3;
 
+  const TIME_FRAME_OPTIONS = [
+    { value: "48h", label: "48 Hours" },
+    { value: "1w", label: "1 Week" },
+    { value: "1m", label: "1 Month" },
+    { value: "6m", label: "6 Months" },
+    { value: "12m", label: "12 Months" }
+  ];
+
   const [rssItems, setRssItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const rssUrl =
     "https://corsproxy.io/?https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6936";
+
+  const calculateBestTimeToExchange = (data) => {
+    // Simple algorithm to determine best time based on historical patterns
+    const hourlyRates = {};
+    data.forEach(item => {
+      const hour = new Date(item.timestamp).getHours();
+      if (!hourlyRates[hour]) hourlyRates[hour] = [];
+      hourlyRates[hour].push(item.rate);
+    });
+
+    // Calculate average rate for each hour
+    const hourlyAverages = Object.entries(hourlyRates).map(([hour, rates]) => ({
+      hour: parseInt(hour),
+      average: rates.reduce((a, b) => a + b, 0) / rates.length
+    }));
+
+    // Find hour with best rate
+    const bestHour = hourlyAverages.reduce((a, b) => 
+      a.average > b.average ? a : b
+    );
+
+    return bestHour;
+  };
 
   useEffect(() => {
     const fetchRssFeed = async () => {
@@ -214,6 +470,10 @@ const CurrencyExchangeApp = () => {
               last1m: getHistoricalRate("WISE", last1m),
             },
           });
+
+          // Calculate best time to exchange
+          const bestTime = calculateBestTimeToExchange(formattedData);
+          setBestTimeToExchange(bestTime);
         });
     };
 
@@ -265,13 +525,37 @@ const CurrencyExchangeApp = () => {
       : `${isChanging ? fadeOut : fadeIn} ${animationDuration}s ease-in-out`;
 
     return (
-      <StatHelpText
-        animation={animation}
-        style={{ opacity: isChanging ? 0 : 1 }}
-      >
-        <StatArrow type={percentageChange >= 0 ? "increase" : "decrease"} />
-        {Math.abs(percentageChange).toFixed(2)}% ({periodText[currentPeriod]})
-      </StatHelpText>
+      <Box>
+        <StatHelpText
+          animation={animation}
+          style={{ opacity: isChanging ? 0 : 1 }}
+          display="flex"
+          alignItems="center"
+          gap={1}
+          bg={percentageChange >= 0 ? "green.50" : "red.50"}
+          p={1}
+          px={2}
+          borderRadius="md"
+          color={percentageChange >= 0 ? "green.600" : "red.600"}
+          fontWeight="medium"
+          fontSize="xs"
+        >
+          <StatArrow 
+            type={percentageChange >= 0 ? "increase" : "decrease"}
+            boxSize={3}
+          />
+          {Math.abs(percentageChange).toFixed(2)}%
+          <Text 
+            as="span" 
+            color="gray.500" 
+            fontSize="xs" 
+            fontWeight="normal"
+            ml={1}
+          >
+            ({periodText[currentPeriod]})
+          </Text>
+        </StatHelpText>
+      </Box>
     );
   };
 
@@ -327,131 +611,111 @@ const CurrencyExchangeApp = () => {
     const processData = () => {
       let groupedData = {};
       data.forEach((item) => {
-        const date = new Date(item.timestamp); // Ensure we are using a proper Date object
+        const date = new Date(item.timestamp);
         let key;
-        switch (timeFrame) {
-          case "hour":
-            key = new Date(
-              date.getFullYear(),
-              date.getMonth(),
-              date.getDate(),
-              date.getHours()
-            ).getTime();
-            break;
-          case "day":
-            // Set the time to midnight (00:00:00) for accurate day comparison
-            key = new Date(
-              date.getFullYear(),
-              date.getMonth(),
-              date.getDate(),
-              0,
-              0,
-              0 // Explicitly set hours, minutes, seconds to 0
-            ).getTime();
-            break;
-          case "month":
-            key = new Date(date.getFullYear(), date.getMonth()).getTime();
-            break;
-          case "year":
-            key = new Date(date.getFullYear(), 0).getTime();
-            break;
-          default:
-            key = date.getTime();
+
+        // Different grouping based on timeframe
+        if (timeFrame === "48h") {
+          // Group by hour for 48h view
+          key = new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            date.getHours()
+          ).getTime();
+        } else if (timeFrame === "1w" || timeFrame === "1m") {
+          // Group by day for week and month views
+          key = new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate()
+          ).getTime();
+        } else {
+          // Group by month for 6m and 12m views
+          key = new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            1
+          ).getTime();
         }
 
-        // Initialize the structure for this key if it doesn't exist
         if (!groupedData[key]) {
           groupedData[key] = {};
         }
 
-        // If groupedData[key][item.platform] is not an object, initialize it as an object
-        if (
-          !groupedData[key][item.platform] ||
-          typeof groupedData[key][item.platform] !== "object"
-        ) {
+        if (!groupedData[key][item.platform]) {
           groupedData[key][item.platform] = { sum: 0, count: 0 };
         }
 
-        // Aggregate the rate (sum and count)
         groupedData[key][item.platform].sum += item.rate;
         groupedData[key][item.platform].count += 1;
       });
 
       const processed = Object.keys(groupedData).map((key) => ({
-        date: formatDate(new Date(Number(key))),
+        date: new Date(Number(key)),
         CIMBRate: groupedData[key]["CIMB"]
-          ? (
-            groupedData[key]["CIMB"].sum / groupedData[key]["CIMB"].count
-          ).toFixed(4)
+          ? (groupedData[key]["CIMB"].sum / groupedData[key]["CIMB"].count).toFixed(4)
           : "-",
         WISERate: groupedData[key]["WISE"]
-          ? (
-            groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count
-          ).toFixed(3)
+          ? (groupedData[key]["WISE"].sum / groupedData[key]["WISE"].count).toFixed(4)
           : "-",
       }));
 
-      // Slice the processed data to include only the last 48 records
-      const limitedProcessed = processed.slice(-24);
+      // Sort by date
+      processed.sort((a, b) => a.date - b.date);
 
-      setChartData(limitedProcessed); // Keep the chart data in ascending order
-      setTableData([...limitedProcessed].reverse()); // Reverse the data for the table
+      // Filter data based on selected time frame
+      const now = new Date();
+      const timeFrames = {
+        "48h": now.getTime() - 48 * 60 * 60 * 1000,
+        "1w": now.getTime() - 7 * 24 * 60 * 60 * 1000,
+        "1m": now.getTime() - 30 * 24 * 60 * 60 * 1000,
+        "6m": now.getTime() - 180 * 24 * 60 * 60 * 1000,
+        "12m": now.getTime() - 365 * 24 * 60 * 60 * 1000
+      };
+
+      const filteredData = processed.filter(item => 
+        item.date.getTime() > timeFrames[timeFrame]
+      );
+
+      setChartData(filteredData);
+      setTableData([...filteredData].reverse());
     };
 
     processData();
   }, [data, timeFrame]);
 
-  const formatDate = (date) => {
-    switch (timeFrame) {
-      case "hour":
-        return date.toLocaleString(undefined, {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      case "day":
-        return date.toLocaleDateString();
-      case "month":
-        return date.toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "long",
-        });
-      case "year":
-        return date.getFullYear().toString();
-      case "15min":
-        return date.toLocaleString(undefined, {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      default:
-        return date.toLocaleDateString();
-    }
-  };
-
   const customTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
-      const formatRate = (rate) => {
-        return typeof rate === "number" ? rate.toFixed(4) : "-";
-      };
-
+      const date = new Date(label);
       return (
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "10px",
-            border: "1px solid #ccc",
-          }}
-        >
-          <p>{formatDate(new Date(payload[0].payload.date))}</p>
-          <p>CIMB: {formatRate(payload[0].payload.CIMBRate)}</p>
-          <p>WISE: {formatRate(payload[0].payload.WISERate)}</p>
-          <p>PANDAREMIT: {formatRate(payload[0].payload.PANDAREMITRate)}</p>
-        </div>
+        <Card>
+          <CardBody p={2}>
+            <VStack align="start" spacing={1}>
+              <Text fontWeight="bold">
+                {timeFrame === "48h" 
+                  ? date.toLocaleString([], {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    })
+                  : date.toLocaleDateString([], {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })
+                }
+              </Text>
+              {payload.map((entry, index) => (
+                <Text key={index} color={entry.stroke}>
+                  {entry.name}: {entry.value}
+                </Text>
+              ))}
+            </VStack>
+          </CardBody>
+        </Card>
       );
     }
     return null;
@@ -508,323 +772,363 @@ const CurrencyExchangeApp = () => {
     }
   };
 
+  // Add this function to filter data based on time frame
+  const filterDataByTimeFrame = (data, timeFrame) => {
+    const now = new Date();
+    const timeFrames = {
+      "48h": now.getTime() - 48 * 60 * 60 * 1000,
+      "1w": now.getTime() - 7 * 24 * 60 * 60 * 1000,
+      "1m": now.getTime() - 30 * 24 * 60 * 60 * 1000,
+      "6m": now.getTime() - 180 * 24 * 60 * 60 * 1000,
+      "12m": now.getTime() - 365 * 24 * 60 * 60 * 1000
+    };
+
+    return data.filter(item => new Date(item.date).getTime() > timeFrames[timeFrame]);
+  };
+
   return (
-    <Container maxW="container.xl" mt={4}>
-      {/* <Flex justifyContent="space-between" alignItems="center">
-        <Heading as="h1" size="lg">
-          EXACTIFY
-        </Heading>
-      </Flex> */}
-
-      {/* Latest Rates Cards */}
-      <StatGroup>
-        <Wrap spacingX="60px" spacingY="10px">
-          {latestRate?.CIMB ? (
-            <WrapItem>
-              <Stat>
-                <StatLabel color="#ED1C24">CIMB</StatLabel>
-                <ChakraTooltip
-                  label={"1 SGD = " + latestRate.CIMB.rate.toFixed(4) + " MYR"}
-                  aria-label="A tooltip"
+    <ChakraProvider theme={theme}>
+      <Box minH="100vh" display="flex" flexDirection="column">
+        {/* Header */}
+        <Box 
+          bg="white" 
+          borderBottom="1px" 
+          borderColor="gray.200" 
+          position="sticky"
+          top={0}
+          zIndex={10}
+        >
+          <Container maxW="container.xl" py={4}>
+            <Flex justify="space-between" align="center">
+              <Heading size="lg" color="brand.teal">Exactify</Heading>
+              <HStack spacing={4}>
+                <Select
+                  w="auto"
+                  size="sm"
+                  value={timeFrame}
+                  onChange={(e) => setTimeFrame(e.target.value)}
+                  borderRadius="full"
                 >
-                  <StatNumber>{latestRate.CIMB.rate.toFixed(4)} MYR</StatNumber>
-                </ChakraTooltip>
-                {renderStatHelpText("CIMB")}
-              </Stat>
-            </WrapItem>
-          ) : (
-            <Spinner />
-          )}
-
-          {latestRate?.WISE && (
-            <WrapItem>
-              <Stat>
-                <StatLabel color="#9fe870">WISE</StatLabel>
-                <ChakraTooltip
-                  label={"1 SGD = " + latestRate.WISE.rate.toFixed(4) + " MYR"}
-                  aria-label="A tooltip"
-                >
-                  <StatNumber>{latestRate.WISE.rate.toFixed(4)} MYR</StatNumber>
-                </ChakraTooltip>
-                {renderStatHelpText("WISE")}
-              </Stat>
-            </WrapItem>
-          )}
-        </Wrap>
-      </StatGroup>
-      {latestRate?.CIMB?.timestamp && (
-        <Box position="relative" padding="4">
-          <Divider />
-          <AbsoluteCenter bg="white" px="4">
-            <ChakraTooltip
-              label="Update every 10 minutes"
-              aria-label="A tooltip"
-            >
-              <Text fontSize="sm">{timeAgo(latestRate.CIMB.timestamp)}</Text>
-            </ChakraTooltip>
-          </AbsoluteCenter>
-        </Box>
-      )}
-      {/* {latestRate?.CIMB?.timestamp && (
-        <Box position="relative" padding="4">
-          <Divider />
-          <AbsoluteCenter bg="white" px="2">
-            <ChakraTooltip
-              label="Update every 10 minutes"
-              aria-label="A tooltip"
-            >
-              {renderAnalysisText("WISE")}
-            </ChakraTooltip>
-          </AbsoluteCenter>
-        </Box>
-      )} */}
-      {/* Currency Conversion Calculator */}
-      <Box mt={0}>
-        <Flex justifyContent="space-between" alignItems="center">
-          <Heading as="h1" size="md">
-            Conversion
-          </Heading>
-          <Select
-            w="auto"
-            size="sm"
-            value={conversionPlatform}
-            onChange={(e) => {
-              setConversionPlatform(e.target.value);
-              if (sgdAmount) handleSgdChange(sgdAmount);
-              else if (myrAmount) handleMyrChange(myrAmount);
-            }}
-            variant="filled"
-          >
-            <option value="CIMB">CIMB</option>
-            <option value="WISE">WISE</option>
-          </Select>
-        </Flex>
-        <Flex flexWrap="wrap" justifyContent="center" mt={4}>
-      <Box w={["70%", "20%"]} px={1} mb={4}>
-        <FormControl>
-          <InputGroup>
-            <InputLeftAddon pointerEvents='none'><img src={SGFlag} alt="SGD Flag" /></InputLeftAddon>
-            <Input
-              type="number"
-              value={sgdAmount}
-              onChange={(e) => handleSgdChange(e.target.value)}
-              placeholder="SGD"
-              variant='outline'
-            />
-          </InputGroup>
-        </FormControl>
-      </Box>
-      <Box w={["70%", "10%"]} px={1} mb={4} display="flex" justifyContent="center" alignItems="center">
-        <ConversionSymbol />
-      </Box>
-      <Box w={["70%", "20%"]} px={1} mb={4}>
-        <FormControl>
-          <InputGroup>
-            <InputLeftAddon pointerEvents='none'><img src={MYFlag} alt="MYR Flag" /></InputLeftAddon>
-            <Input
-              type="number"
-              value={myrAmount}
-              onChange={(e) => handleMyrChange(e.target.value)}
-              placeholder="MYR"
-              variant='outline'
-            />
-          </InputGroup>
-        </FormControl>
-      </Box>
-    </Flex>
-      </Box>
-      <Box position="relative" padding="4">
-        <Divider />
-      </Box>
-      {/* Historical Rates */}
-      <Box mt={4}>
-        <Flex justifyContent="space-between" alignItems="center">
-          <Heading as="h1" size="md">
-            Historical Rates
-          </Heading>
-          <Select
-            w="auto"
-            size="sm"
-            value={timeFrame}
-            onChange={(e) => setTimeFrame(e.target.value)}
-            variant="filled"
-          >
-            <option value="15min">Every 5 Minutes</option>
-            <option value="hour">Hourly</option>
-            <option value="day">Daily</option>
-          </Select>
-        </Flex>
-        {/* <Box position="relative" padding="10">
-          <Divider />
-          <AbsoluteCenter bg="white" px="4">
-            Content
-          </AbsoluteCenter>
-        </Box> */}
-        <Flex flexWrap="wrap" mt={4}>
-          <Box w={["100%", "50%"]} pr={[0, 4]} mb={0}>
-            <ResponsiveContainer width="100%" height={408}>
-              <LineChart
-                data={chartData}
-                margin={{
-                  top: 20,
-                  right: 0,
-                  left: 0,
-                  bottom: 20,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  interval={48}
-                  tickFormatter={(value, index) => {
-                    if (index === 0 || index === chartData.length - 1) {
-                      return "";
-                    }
-                    return "";
-                  }}
-                  angle={0}
-                  textAnchor="start"
-                />
-                <YAxis domain={yAxisDomain} />
-                <Tooltip />
-                <Line
-                  type="natural"
-                  dataKey="CIMBRate"
-                  name="CIMB"
-                  stroke="#ED1C24"
-                  dot={false}
-                  strokeWidth={2}
-                  animationEasing="linear"
-                />
-                <Line
-                  type="natural"
-                  dataKey="WISERate"
-                  stroke="#9fe870"
-                  name="WISE"
-                  dot={false}
-                  strokeWidth={2}
-                  animationEasing="linear"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </Box>
-          <Box w={["100%", "50%"]} pl={[0, 4]} mb={0}>
-            <Table variant="simple" size="md">
-              <Thead>
-                <Tr>
-                  <Th>Date</Th>
-                  <Th>CIMB</Th>
-                  <Th>WISE</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {currentRecords.map((row, index) => (
-                  <Tr key={index}>
-                    <Td>{row.date}</Td>
-                    <Td>{row.CIMBRate}</Td>
-                    <Td>{row.WISERate}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {totalPages > 1 && (
-              <Flex justifyContent="center" mt={4}>
-                <ButtonGroup>
-                  {[...Array(totalPages)].map((_, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => handlePageChange(index + 1)}
-                      isDisabled={currentPage === index + 1}
-                      colorScheme="teal"
-                      variant="ghost"
-                      size="sm"
-                    >
-                      {index + 1}
-                    </Button>
+                  {TIME_FRAME_OPTIONS.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
-                </ButtonGroup>
-              </Flex>
-            )}
-          </Box>
-        </Flex>
-      </Box>
+                </Select>
+                <Text fontSize="sm" color="gray.500">
+                  Updated {latestRate?.CIMB && timeAgo(latestRate.CIMB.timestamp)}
+                </Text>
+              </HStack>
+            </Flex>
+          </Container>
+        </Box>
 
-      {renderAnalysisText("WISE")}
-      <Box position="relative" padding="4">
-        <Divider />
-        <AbsoluteCenter bg="white" px="4">
-          {/* <ChakraTooltip
-              label="Update every 10 minutes"
-              aria-label="A tooltip"
-            > */}
-          <Text fontSize="sm">Powered by <Link href="https://www.llama.com/" color="teal.500">
-            LLAMA3.2
-          </Link></Text>
-          {/* </ChakraTooltip> */}
-        </AbsoluteCenter>
-      </Box>
-      {/* RSS Feed Section */}
-      <Box mt={4} mb={4}>
-        <Heading as="h2" size="md" mb={4}>
-          Latest News
-        </Heading>
-        {isLoading ? (
-          <Flex
-            // height="100vh" // Full viewport height
-            justifyContent="center" // Center horizontally
-            alignItems="center" // Center vertically
-          >
-            <Spinner />
-          </Flex>
-        ) : error ? (
-          <Text color="red.500">{error}</Text>
-        ) : (
-          <VStack align="stretch" spacing={4}>
-            <Card variant="outline">
-              {/* <CardHeader>
-                  <Heading as="h3" size="sm">
-                    Latest News
-                  </Heading>
-                </CardHeader> */}
-              <CardBody>
-                <Stack divider={<StackDivider />} spacing="4">
-                  {rssItems.map((item, index) => (
-                    <Box>
-                      {/* <Image
-                        objectFit="cover"
-                        maxW={{
-                          base: "100%",
-                          sm: "100px",
-                        }}
-                        src={item.enclosure.url}
-                        alt="Caffe Latte"
-                        mr="10px"
-                      /> */}
-                      <Box>
-                        <Heading size="xs" textTransform="uppercase">
-                          <Link href={item.link} isExternal>
-                            {item.title}
-                          </Link>
-                        </Heading>
-                        <Text pt="2" fontSize="sm">
-                          {item.contentSnippet
-                            .replace("Read full story", "")
-                            .trim()}
-                        </Text>
-                        <Text pt="0" fontSize="xs" textAlign="right">
-                          {timeAgo(item.pubDate)}
-                        </Text>
+        {/* Main Content */}
+        <Box flex="1" py={8}>
+          <Container maxW="container.xl">
+            {/* Exchange Rates Section */}
+            <Section title="Exchange Rates">
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                {latestRate?.CIMB && (
+                  <RateCard
+                    platform="CIMB"
+                    rate={latestRate.CIMB.rate}
+                    color="brand.cimb"
+                    logo={CIMBLogo}
+                    data={chartData}
+                    timeFrame={timeFrame}
+                  />
+                )}
+                {latestRate?.WISE && (
+                  <RateCard
+                    platform="WISE"
+                    rate={latestRate.WISE.rate}
+                    color="brand.wise"
+                    logo={WiseLogo}
+                    data={chartData}
+                    timeFrame={timeFrame}
+                  />
+                )}
+                
+                {/* Currency Converter Card */}
+                <Card height="100%">
+                  <CardBody>
+                    <VStack spacing={6}>
+                      <Heading size="sm">Currency Converter</Heading>
+                      <SimpleGrid columns={1} spacing={4} w="100%">
+                        <FormControl>
+                          <InputGroup size="lg">
+                            <InputLeftAddon p={2}>
+                              <Image src={SGFlag} alt="SGD" boxSize="24px" />
+                            </InputLeftAddon>
+                            <Input
+                              type="number"
+                              value={sgdAmount}
+                              onChange={(e) => handleSgdChange(e.target.value)}
+                              placeholder="Enter SGD"
+                              borderRadius="md"
+                            />
+                          </InputGroup>
+                        </FormControl>
+
+                        <FormControl>
+                          <InputGroup size="lg">
+                            <InputLeftAddon p={2}>
+                              <Image src={MYFlag} alt="MYR" boxSize="24px" />
+                            </InputLeftAddon>
+                            <Input
+                              type="number"
+                              value={myrAmount}
+                              onChange={(e) => handleMyrChange(e.target.value)}
+                              placeholder="Enter MYR"
+                              borderRadius="md"
+                            />
+                          </InputGroup>
+                        </FormControl>
+                      </SimpleGrid>
+
+                      <Box w="100%">
+                        <SimpleGrid columns={2} spacing={3}>
+                          {[100, 500, 1000, 5000].map(amount => (
+                            <Button
+                              key={amount}
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSgdChange(amount.toString())}
+                              width="100%"
+                            >
+                              SGD {amount}
+                            </Button>
+                          ))}
+                        </SimpleGrid>
                       </Box>
-                    </Box>
-                  ))}
-                </Stack>
-              </CardBody>
-            </Card>
-          </VStack>
-        )}
+
+                      <Text fontSize="sm" color="gray.500">
+                        1 SGD = {latestRate?.[conversionPlatform]?.rate.toFixed(4)} MYR
+                      </Text>
+                    </VStack>
+                  </CardBody>
+                </Card>
+              </SimpleGrid>
+            </Section>
+
+            {/* Analysis Section */}
+            <Section title="Analysis">
+              <Card>
+                <Tabs variant="enclosed" colorScheme="teal">
+                  <TabList px={4} pt={4}>
+                    <Tab>Chart</Tab>
+                    <Tab>History</Tab>
+                    <Tab>Compare</Tab>
+                  </TabList>
+
+                  <TabPanels>
+                    {/* Chart Panel */}
+                    <TabPanel p={0} pt={4}>
+                      <Card>
+                        <CardBody>
+                          <Box h="400px">
+                            <ResponsiveContainer>
+                              <LineChart
+                                data={filterDataByTimeFrame(chartData, timeFrame)}
+                                margin={{
+                                  top: 20,
+                                  right: 20,
+                                  left: 20,
+                                  bottom: 20,
+                                }}
+                              >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                  dataKey="date"
+                                  tickFormatter={(value) => {
+                                    const date = new Date(value);
+                                    if (timeFrame === "48h") {
+                                      return date.toLocaleTimeString([], { 
+                                        hour: '2-digit', 
+                                        minute: '2-digit',
+                                        hour12: false 
+                                      });
+                                    } else if (timeFrame === "1w" || timeFrame === "1m") {
+                                      return date.toLocaleDateString([], {
+                                        month: 'short',
+                                        day: 'numeric'
+                                      });
+                                    } else {
+                                      // For 6m and 12m views
+                                      return date.toLocaleDateString([], {
+                                        month: 'short',
+                                        year: '2-digit'
+                                      });
+                                    }
+                                  }}
+                                  interval={timeFrame === "48h" ? 3 : timeFrame === "6m" || timeFrame === "12m" ? 1 : 0}
+                                  angle={timeFrame === "48h" ? -45 : 0}
+                                  textAnchor="end"
+                                  height={60}
+                                />
+                                <YAxis domain={yAxisDomain} />
+                                <Tooltip content={customTooltip} />
+                                <Legend />
+                                <Line
+                                  type="monotone"
+                                  dataKey="CIMBRate"
+                                  stroke="#ED1C24"
+                                  name="CIMB"
+                                  dot={false}
+                                  strokeWidth={2}
+                                />
+                                <Line
+                                  type="monotone"
+                                  dataKey="WISERate"
+                                  stroke="#9fe870"
+                                  name="WISE"
+                                  dot={false}
+                                  strokeWidth={2}
+                                />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </Box>
+                        </CardBody>
+                      </Card>
+                    </TabPanel>
+
+                    {/* History Panel */}
+                    <TabPanel p={0} pt={4}>
+                      <Card>
+                        <CardBody>
+                          <Table variant="simple" size="sm">
+                            <Thead>
+                              <Tr>
+                                <Th>Date</Th>
+                                <Th isNumeric>CIMB</Th>
+                                <Th isNumeric>WISE</Th>
+                                <Th isNumeric>Difference</Th>
+                              </Tr>
+                            </Thead>
+                            <Tbody>
+                              {filterDataByTimeFrame(tableData, timeFrame)
+                                .slice(0, 10)
+                                .map((row, index) => {
+                                  const difference = ((parseFloat(row.CIMBRate) - parseFloat(row.WISERate)) / parseFloat(row.WISERate) * 100).toFixed(2);
+                                  return (
+                                    <Tr key={index}>
+                                      <Td>{formatDateTime(row.date, timeFrame)}</Td>
+                                      <Td isNumeric>{row.CIMBRate}</Td>
+                                      <Td isNumeric>{row.WISERate}</Td>
+                                      <Td isNumeric color={difference >= 0 ? "green.500" : "red.500"}>
+                                        {difference}%
+                                      </Td>
+                                    </Tr>
+                                  );
+                                })}
+                            </Tbody>
+                          </Table>
+                        </CardBody>
+                      </Card>
+                    </TabPanel>
+
+                    {/* Compare Panel */}
+                    <TabPanel p={0} pt={4}>
+                      <Card>
+                        <CardBody>
+                          <ChakraBox overflowX="auto" whiteSpace="nowrap">
+                            <Table size="sm" style={{ minWidth: "650px" }}>
+                              <Thead>
+                                <Tr>
+                                  <Th width="20%">Platform</Th>
+                                  <Th width="20%" isNumeric>Average Rate</Th>
+                                  <Th width="20%" isNumeric>Highest</Th>
+                                  <Th width="20%" isNumeric>Lowest</Th>
+                                  <Th width="20%" isNumeric>Current</Th>
+                                </Tr>
+                              </Thead>
+                              <Tbody>
+                                {latestRate && Object.entries(latestRate).map(([platform, data]) => {
+                                  const filteredData = filterDataByTimeFrame(chartData, timeFrame);
+                                  const rates = filteredData.map(item => parseFloat(item[`${platform}Rate`])).filter(rate => !isNaN(rate));
+                                  const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+                                  const highestRate = Math.max(...rates);
+                                  const lowestRate = Math.min(...rates);
+                                  
+                                  return (
+                                    <Tr key={platform}>
+                                      <Td>
+                                        <Flex alignItems="center" gap={2} minWidth="100px">
+                                          <Image 
+                                            src={platform === "CIMB" ? CIMBLogo : WiseLogo} 
+                                            alt={platform} 
+                                            boxSize="20px"
+                                          />
+                                          {platform}
+                                        </Flex>
+                                      </Td>
+                                      <Td isNumeric>{avgRate.toFixed(4)}</Td>
+                                      <Td isNumeric color="green.500">{highestRate.toFixed(4)}</Td>
+                                      <Td isNumeric color="red.500">{lowestRate.toFixed(4)}</Td>
+                                      <Td isNumeric fontWeight="bold">{data.rate.toFixed(4)}</Td>
+                                    </Tr>
+                                  );
+                                })}
+                              </Tbody>
+                            </Table>
+                          </ChakraBox>
+                          <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
+                            Swipe left/right to view more
+                          </Text>
+                        </CardBody>
+                      </Card>
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
+              </Card>
+            </Section>
+
+            {/* Best Time Section */}
+            {bestTimeToExchange && (
+              <Section title="Recommendation">
+                <Card>
+                  <CardBody>
+                    <HStack spacing={4}>
+                      <Icon as={InfoOutlineIcon} color="brand.teal" boxSize={5} />
+                      <VStack align="start" spacing={1}>
+                        <Text fontWeight="medium">Best Time to Exchange</Text>
+                        <Text color="gray.600">
+                          Historical data suggests the best rates occur around{' '}
+                          <Text as="span" fontWeight="bold" color="brand.teal">
+                            {bestTimeToExchange.hour}:00 SGT
+                          </Text>
+                        </Text>
+                      </VStack>
+                    </HStack>
+                  </CardBody>
+                </Card>
+              </Section>
+            )}
+          </Container>
+        </Box>
+
+        {/* Footer */}
+        <Box bg="white" borderTop="1px" borderColor="gray.200" py={6}>
+          <Container maxW="container.xl">
+            <VStack spacing={2}>
+              <Text fontSize="sm" color="gray.600">
+                Made with ♥ by{" "}
+                <Link href="https://github.com/likweitan" isExternal color="brand.teal">
+                  @likweitan
+                </Link>
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                Exactify is not associated with{" "}
+                <Link href="https://www.cimb.com.sg" color="brand.teal">CIMB</Link>
+                {" "}or{" "}
+                <Link href="https://www.wise.com" color="brand.teal">WISE</Link>
+              </Text>
+            </VStack>
+          </Container>
+        </Box>
       </Box>
-      {/* <Box><CurrencyExchangeLocator /></Box> */}
-    </Container>
+    </ChakraProvider>
   );
 };
 
