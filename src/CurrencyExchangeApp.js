@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceArea,
 } from "recharts";
 import {
   Container,
@@ -784,6 +785,62 @@ const CurrencyExchangeApp = () => {
     return data.filter(item => new Date(item.date).getTime() > timeFrames[timeFrame]);
   };
 
+  // Update the generateReferenceAreas function
+  const generateReferenceAreas = () => {
+    const areas = [];
+    const data = filterDataByTimeFrame(chartData, timeFrame);
+    
+    if (data.length === 0) return [];
+
+    const startDate = new Date(data[0].date);
+    const endDate = new Date(data[data.length - 1].date);
+    
+    let currentDate = new Date(startDate);
+    
+    // Generate areas for both night hours and weekends
+    while (currentDate <= endDate) {
+      // Add night areas (only for 48h view)
+      if (timeFrame === "48h") {
+        const nightStart = new Date(currentDate);
+        nightStart.setHours(19, 0, 0, 0);  // 19:00
+        
+        const nextDayMorning = new Date(currentDate);
+        nextDayMorning.setDate(currentDate.getDate() + 1);
+        nextDayMorning.setHours(7, 0, 0, 0);  // 7:00 next day
+
+        areas.push({
+          start: nightStart.getTime(),
+          end: nextDayMorning.getTime(),
+          type: 'night',
+          label: '🌙 Night Hours (19:00-07:00)'
+        });
+      }
+
+      // Add weekend areas
+      const dayOfWeek = currentDate.getDay();
+      if (dayOfWeek === 6) { // Saturday
+        const weekendStart = new Date(currentDate);
+        weekendStart.setHours(0, 0, 0, 0);
+        
+        const weekendEnd = new Date(currentDate);
+        weekendEnd.setDate(weekendEnd.getDate() + 2); // Add 2 days to cover Saturday and Sunday
+        weekendEnd.setHours(0, 0, 0, 0);
+
+        areas.push({
+          start: weekendStart.getTime(),
+          end: weekendEnd.getTime(),
+          type: 'weekend',
+          label: '📅 Weekend'
+        });
+      }
+
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return areas;
+  };
+
   return (
     <ChakraProvider theme={theme}>
       <Box minH="100vh" display="flex" flexDirection="column">
@@ -941,17 +998,40 @@ const CurrencyExchangeApp = () => {
                               <LineChart
                                 data={filterDataByTimeFrame(chartData, timeFrame)}
                                 margin={{
-                                  top: 10,
+                                  top: 20, // Increased top margin to accommodate labels
                                   right: 10,
-                                  left: 0,  // Removed left margin since we're hiding Y-axis labels
+                                  left: 0,
                                   bottom: 40,
                                 }}
                               >
                                 <CartesianGrid 
                                   strokeDasharray="3 3" 
-                                  vertical={false}  // Only show horizontal grid lines
+                                  vertical={false}
                                   opacity={0.5}
                                 />
+                                {/* Add Reference Areas before the lines */}
+                                {generateReferenceAreas().map((area, index) => (
+                                  <React.Fragment key={index}>
+                                    <ReferenceArea
+                                      x1={area.start}
+                                      x2={area.end}
+                                      fill={area.type === 'night' ? '#2D3748' : '#1A202C'}
+                                      fillOpacity={area.type === 'weekend' ? 0.03 : 0.08}
+                                      ifOverflow="extendDomain"
+                                    />
+                                    {timeFrame === "48h" && area.type === 'night' && (
+                                      <text
+                                        x={(new Date(area.start).getTime() + new Date(area.end).getTime()) / 2}
+                                        y={15}
+                                        textAnchor="middle"
+                                        fill="#718096"
+                                        fontSize="12"
+                                      >
+                                        {area.label}
+                                      </text>
+                                    )}
+                                  </React.Fragment>
+                                ))}
                                 <XAxis
                                   dataKey="date"
                                   tickFormatter={(value) => {
